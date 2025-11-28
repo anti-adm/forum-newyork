@@ -1,0 +1,65 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  // url больше не пишем тут, он будет в prisma.config.ts
+}
+
+model User {
+  id                     Int        @id @default(autoincrement())
+  username               String     @unique
+  passwordHash           String
+  role                   String     @default("ADMIN") // "ADMIN" | "SUPERADMIN"
+  isActive               Boolean    @default(true)
+  isSystem               Boolean    @default(false)
+
+  adminTag           String   @default("NONE")
+  avatarUrl      String?
+  
+  twoFactorEnabled  Boolean @default(false)
+  twoFactorSecret   String?
+  twoFactorConfirmed Boolean @default(false)
+
+  lastComplaintCode      String?
+  lastComplaintUpdatedAt DateTime?
+
+  punishments            Punishment[]
+  adminLogs              AdminLog[]
+}
+
+model Punishment {
+  id            Int      @id @default(autoincrement())
+  adminId       Int
+  admin         User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  type          String   // 'ajail' | 'mute' | 'warn' | 'ban' | 'hardban'
+  staticId      Int
+  duration      Int      // в минутах (0 для warn)
+  durationUnit  String   // 'MINUTES' | 'NONE'
+  complaintCode String
+  issued        Boolean  @default(false)
+  command       String
+  createdAt     DateTime @default(now())
+
+  @@index([adminId, createdAt])
+}
+
+model Setting {
+  id    Int    @id @default(autoincrement())
+  key   String @unique
+  value String
+}
+
+model AdminLog {
+  id        Int      @id @default(autoincrement())
+  adminId   Int
+  admin     User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  action    String   // 'CREATE_ADMIN', 'DELETE_ADMIN', ...
+  meta      String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}

@@ -19,7 +19,7 @@ interface AdminUser {
   isSystem: boolean;
   adminTag: AdminTagType;
   avatarUrl: string | null;
-  twoFactorEnabled: boolean; // 👈 добавили флаг 2FA
+  twoFactorEnabled: boolean;
 }
 
 interface AdminLogItem {

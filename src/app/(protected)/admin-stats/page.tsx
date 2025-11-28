@@ -1,20 +1,26 @@
 // src/app/(protected)/admin-stats/page.tsx
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { getAuthPayloadFromCookies } from "@/lib/auth";
+
+interface AdminUser {
+  id: number;
+  username: string;
+}
 
 function startOfDay(d = new Date()) {
   const date = new Date(d);
   date.setHours(0, 0, 0, 0);
   return date;
 }
+
 function startOfWeek() {
   const d = new Date();
   const day = (d.getDay() + 6) % 7; // понедельник
   d.setDate(d.getDate() - day);
   return startOfDay(d);
 }
+
 function startOfMonth() {
   const d = new Date();
   d.setDate(1);
@@ -27,10 +33,15 @@ export default async function AdminStatsPage() {
     redirect("/");
   }
 
+  // берём только нужные поля, чтобы тип совпадал с AdminUser
   const [admins, dailyNormSetting] = await Promise.all([
     prisma.user.findMany({
       where: { isActive: true },
       orderBy: { id: "asc" },
+      select: {
+        id: true,
+        username: true,
+      },
     }),
     prisma.setting.findUnique({ where: { key: "daily_norm" } }),
   ]);
@@ -42,41 +53,40 @@ export default async function AdminStatsPage() {
     startOfMonth(),
   ];
 
-const stats = await Promise.all(
-  admins.map(async (admin) => {
-    const [dayRows, weekRows, monthRows] = await Promise.all([
-      prisma.punishment.findMany({
-        where: { adminId: admin.id, createdAt: { gte: dayStart } },
-        distinct: ["complaintCode"],
-        select: { complaintCode: true },
-      }),
-      prisma.punishment.findMany({
-        where: { adminId: admin.id, createdAt: { gte: weekStart } },
-        distinct: ["complaintCode"],
-        select: { complaintCode: true },
-      }),
-      prisma.punishment.findMany({
-        where: { adminId: admin.id, createdAt: { gte: monthStart } },
-        distinct: ["complaintCode"],
-        select: { complaintCode: true },
-      }),
-    ]);
+  const stats = await Promise.all(
+    admins.map(async (admin): Promise<{ admin: AdminUser; day: number; week: number; month: number }> => {
+      const [dayRows, weekRows, monthRows] = await Promise.all([
+        prisma.punishment.findMany({
+          where: { adminId: admin.id, createdAt: { gte: dayStart } },
+          distinct: ["complaintCode"],
+          select: { complaintCode: true },
+        }),
+        prisma.punishment.findMany({
+          where: { adminId: admin.id, createdAt: { gte: weekStart } },
+          distinct: ["complaintCode"],
+          select: { complaintCode: true },
+        }),
+        prisma.punishment.findMany({
+          where: { adminId: admin.id, createdAt: { gte: monthStart } },
+          distinct: ["complaintCode"],
+          select: { complaintCode: true },
+        }),
+      ]);
 
-    const day = dayRows.length;
-    const week = weekRows.length;
-    const month = monthRows.length;
+      const day = dayRows.length;
+      const week = weekRows.length;
+      const month = monthRows.length;
 
-    return { admin, day, week, month };
-  })
-);
+      return { admin, day, week, month };
+    })
+  );
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-1">
         <h1 className="text-xl font-semibold">Статистика админов</h1>
         <p className="text-xs text-slate-400">
-          Доступно только супер-админам. Отслеживайте выполнение норм и
-          активность состава.
+          Доступно только супер-админам. Отслеживайте выполнение норм и активность состава.
         </p>
       </div>
 
@@ -93,8 +103,8 @@ const stats = await Promise.all(
           </thead>
           <tbody>
             {stats.map(({ admin, day, week, month }) => {
-              const progress =
-                dailyNorm > 0 ? Math.min(1, day / dailyNorm) : 0;
+              const progress = dailyNorm > 0 ? Math.min(1, day / dailyNorm) : 0;
+
               return (
                 <tr key={admin.id}>
                   <td className="pr-4">
@@ -126,6 +136,7 @@ const stats = await Promise.all(
                 </tr>
               );
             })}
+
             {stats.length === 0 && (
               <tr>
                 <td
@@ -140,27 +151,22 @@ const stats = await Promise.all(
         </table>
       </div>
 
-      {/* FAQ блок снизу */}
       <div className="rounded-3xl border border-white/8 bg-black/60 backdrop-blur-xl px-5 md:px-6 py-4 shadow-[0_0_40px_rgba(0,0,0,0.9)] text-xs text-slate-400 space-y-1.5">
         <div className="text-[11px] uppercase tracking-[0.16em] text-slate-500 mb-1">
           FAQ
         </div>
         <p>
-          <span className="text-slate-200">Сегодня</span> — с 00:00 текущего дня
-          по московскому времени.
+          <span className="text-slate-200">Сегодня</span> — с 00:00 текущего дня.
         </p>
         <p>
-          <span className="text-slate-200">Неделя</span> — с понедельника
-          текущей недели.
+          <span className="text-slate-200">Неделя</span> — с понедельника текущей недели.
         </p>
         <p>
-          <span className="text-slate-200">Месяц</span> — с 1 числа текущего
-          месяца.
+          <span className="text-slate-200">Месяц</span> — с 1 числа текущего месяца.
         </p>
         <p>
-          <span className="text-slate-200">Норма</span> — дневное количество
-          жалоб, которое должен выполнить администратор. Изменяется в
-          разделе{" "}
+          <span className="text-slate-200">Норма</span> — дневное количество жалоб,
+          которое должен выполнить администратор. Изменяется в разделе{" "}
           <span className="text-red-300 font-medium">Настройки супер-админа</span>.
         </p>
       </div>

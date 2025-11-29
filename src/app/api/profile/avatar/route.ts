@@ -7,13 +7,15 @@ import { prisma } from "@/lib/prisma";
 import { getAuthPayloadFromCookies } from "@/lib/auth";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 function getExtension(mime: string): string {
   if (mime === "image/png") return "png";
   if (mime === "image/webp") return "webp";
   if (mime === "image/jpeg") return "jpg";
   if (mime === "image/jpg") return "jpg";
-  return "jpg"; // fallback
+  return "jpg";
 }
 
 async function removeFileIfExists(relativePath: string | null | undefined) {
@@ -27,7 +29,7 @@ async function removeFileIfExists(relativePath: string | null | undefined) {
     );
     await fs.unlink(absolute);
   } catch {
-    // игнорируем, если файла нет
+    // файла может не быть — ок
   }
 }
 
@@ -35,6 +37,19 @@ export async function POST(req: NextRequest) {
   const payload = await getAuthPayloadFromCookies();
   if (!payload) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Сначала убеждаемся, что юзер вообще существует
+  const user = await prisma.user.findUnique({
+    where: { id: payload.userId },
+    select: { id: true, avatarUrl: true },
+  });
+
+  if (!user) {
+    return NextResponse.json(
+      { error: "Пользователь не найден (перелогинься)" },
+      { status: 404 }
+    );
   }
 
   const formData = await req.formData();
@@ -45,14 +60,17 @@ export async function POST(req: NextRequest) {
   }
 
   if (!file.type.startsWith("image/")) {
-    return NextResponse.json({ error: "Можно загружать только изображения" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Можно загружать только изображения" },
+      { status: 400 }
+    );
   }
 
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
   const ext = getExtension(file.type);
-  const fileName = `${payload.userId}-${randomUUID()}.${ext}`;
+  const fileName = `${user.id}-${randomUUID()}.${ext}`;
   const uploadDir = path.join(process.cwd(), "public", "uploads", "avatars");
 
   await fs.mkdir(uploadDir, { recursive: true });
@@ -62,18 +80,12 @@ export async function POST(req: NextRequest) {
 
   const publicPath = `/uploads/avatars/${fileName}`;
 
-  // получить текущую аватарку
-  const current = await prisma.user.findUnique({
-    where: { id: payload.userId },
-    select: { avatarUrl: true },
-  });
+  // удаляем старую аву, если была
+  await removeFileIfExists(user.avatarUrl ?? undefined);
 
-  // удалить старую
-  await removeFileIfExists(current?.avatarUrl ?? undefined);
-
-  // сохранить новую
+  // сохраняем новую в БД
   await prisma.user.update({
-    where: { id: payload.userId },
+    where: { id: user.id },
     data: { avatarUrl: publicPath },
   });
 
@@ -86,15 +98,22 @@ export async function DELETE() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const current = await prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { id: payload.userId },
-    select: { avatarUrl: true },
+    select: { id: true, avatarUrl: true },
   });
 
-  await removeFileIfExists(current?.avatarUrl ?? undefined);
+  if (!user) {
+    return NextResponse.json(
+      { error: "Пользователь не найден (перелогинься)" },
+      { status: 404 }
+    );
+  }
+
+  await removeFileIfExists(user.avatarUrl ?? undefined);
 
   await prisma.user.update({
-    where: { id: payload.userId },
+    where: { id: user.id },
     data: { avatarUrl: null },
   });
 

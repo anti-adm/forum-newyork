@@ -313,7 +313,7 @@ export default function ProfilePage() {
               )}
             </div>
             <p className="mt-2 text-[11px] text-slate-500">
-              Формат PNG/WebP.
+              Формат PNG/WebP/jpeg.
             </p>
           </div>
         </div>

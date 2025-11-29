@@ -11,7 +11,9 @@ export const runtime = "nodejs";
 function getExtension(mime: string): string {
   if (mime === "image/png") return "png";
   if (mime === "image/webp") return "webp";
-  return "jpg";
+  if (mime === "image/jpeg") return "jpg";
+  if (mime === "image/jpg") return "jpg";
+  return "jpg"; // fallback
 }
 
 async function removeFileIfExists(relativePath: string | null | undefined) {

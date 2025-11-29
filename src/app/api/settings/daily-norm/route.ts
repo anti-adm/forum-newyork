@@ -1,35 +1,35 @@
-// src/app/api/settings/daily-norm/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getAuthPayloadFromCookies } from '@/lib/auth';
-import { logAdminAction } from '@/lib/log';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
-  const auth = await getAuthPayloadFromCookies();
-  if (!auth) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-  if (auth.role !== 'SUPERADMIN') {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
+  try {
+    const body = await req.json().catch(() => ({}));
+    const value = Number(body.value ?? 0);
 
-  const { value } = await req.json();
-  const numeric = Number(value);
+    if (Number.isNaN(value) || value < 0) {
+      return NextResponse.json(
+        { error: "Некорректное значение нормы" },
+        { status: 400 }
+      );
+    }
 
-  if (!Number.isInteger(numeric) || numeric < 0) {
+    await prisma.setting.upsert({
+      where: { key: "daily_norm" },
+      create: {
+        key: "daily_norm",
+        value: String(value),
+      },
+      update: {
+        value: String(value),
+      },
+    });
+
+    return NextResponse.json({ ok: true });
+  } catch (e) {
+    console.error("POST /api/settings/daily-norm error", e);
     return NextResponse.json(
-      { error: 'Норма должна быть целым числом >= 0' },
-      { status: 400 },
+      { error: "Не удалось сохранить норму" },
+      { status: 500 }
     );
   }
-
-  const setting = await prisma.setting.upsert({
-    where: { key: 'daily_norm' },
-    update: { value: String(numeric) },
-    create: { key: 'daily_norm', value: String(numeric) },
-  });
-
-  await logAdminAction(auth.userId, 'CHANGE_NORM', `newValue=${numeric}`);
-
-  return NextResponse.json({ value: Number(setting.value) });
 }

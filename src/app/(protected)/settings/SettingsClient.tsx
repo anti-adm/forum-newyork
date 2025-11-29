@@ -2,6 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { formatMSK } from "@/lib/time";
 
 type Admin = {
   id: number;
@@ -400,7 +401,7 @@ export default function SettingsClient() {
                       )}
                     </td>
                     <td className="px-2 py-1 text-[11px] text-slate-300">
-                      {new Date(l.createdAt).toLocaleString()}
+                      {formatMSK(l.createdAt)}
                     </td>
                   </tr>
                 ))}

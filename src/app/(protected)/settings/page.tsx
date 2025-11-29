@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useState, FormEvent } from "react";
+import { formatMSK } from "@/lib/time";
 
 type AdminTagType =
   | "NONE"
@@ -438,7 +439,7 @@ export default function SettingsPage() {
                     </div>
                   </td>
                   <td className="text-[11px] text-slate-400">
-                    {new Date(log.createdAt).toLocaleString("ru-RU")}
+                    {formatMSK(log.createdAt)}
                   </td>
                 </tr>
               ))}

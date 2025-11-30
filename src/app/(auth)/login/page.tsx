@@ -1,151 +1,208 @@
+// src/app/login/page.tsx
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 
-type AdminTagType =
-  | "NONE"
-  | "LOG_HUNTER"
-  | "CHEAT_HUNTER"
-  | "FORUM"
-  | "CHIEF"
-  | "CHIEF_CURATOR"
-  | "SENIOR"
-  | "CHIEF_ADMINISTRATOR"
-  | "DEPUTY_CHIEF"
-  | "DEVELOPER";
+export default function LoginPage() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
-interface ProfileMeResponse {
-  username: string;
-  role: "ADMIN" | "SUPERADMIN";
-  adminTag: AdminTagType;
-  avatarUrl: string | null;
-  twoFactorEnabled: boolean;
-}
+  const [step, setStep] = useState<"login" | "2fa">("login");
+  const [tempToken, setTempToken] = useState<string>("");
+  const [twofaCode, setTwofaCode] = useState("");
 
-// 🎨 Стили тегов
-function getTagStyles(tag: AdminTagType) {
-  switch (tag) {
-    case "LOG_HUNTER":
-      return "bg-sky-500/15 border-sky-400/60 text-sky-200";
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState("");
 
-    case "CHEAT_HUNTER":
-      return "bg-purple-500/20 border-purple-400/80 text-purple-100";
+  // ---------- LOGIN ----------
+  async function handleLogin(e?: React.FormEvent) {
+    e?.preventDefault();
+    if (!username || !password || loading) return;
 
-    case "SENIOR":
-      return "bg-fuchsia-500/25 border-fuchsia-400/90 text-fuchsia-100";
+    setLoading(true);
+    setErr("");
 
-    case "CHIEF_CURATOR":
-      return "bg-teal-500/15 border-cyan-300/90 text-teal-50";
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
 
-    case "CHIEF":
-      return "tag-chief";
+      const data = await res.json();
 
-    case "FORUM":
-      return "bg-red-500/25 border-red-500/80 text-red-100";
-
-    case "DEVELOPER":
-      return "border-red-500/80 text-red-50 tag-dev";
-
-    case "DEPUTY_CHIEF":
-      return "border-cyan-300/90 text-cyan-50 tag-deputy-head";
-
-    case "CHIEF_ADMINISTRATOR":
-      return "border-sky-300/90 text-sky-50 tag-chief-admin";
-
-    case "NONE":
-    default:
-      return "bg-slate-800/60 border-slate-600/70 text-slate-200";
-  }
-}
-
-// 🏷 Названия тегов
-function getTagLabel(tag: AdminTagType) {
-  switch (tag) {
-    case "LOG_HUNTER":
-      return "LogHunter";
-    case "CHEAT_HUNTER":
-      return "CheatHunter";
-    case "FORUM":
-      return "Forum";
-    case "CHIEF_CURATOR":
-      return "ChiefCurator";
-    case "SENIOR":
-      return "Senior";
-    case "DEVELOPER":
-      return "Developer";
-    case "CHIEF_ADMINISTRATOR":
-      return "ChiefAdministrator";
-    case "DEPUTY_CHIEF":
-      return "DeputyChief";
-    case "NONE":
-    default:
-      return "Нет роли";
-  }
-}
-
-export default function ProfilePage() {
-  const [profile, setProfile] = useState<ProfileMeResponse | null>(null);
-  const [loadingProfile, setLoadingProfile] = useState(true);
-
-  // ⚡ Исправленная загрузка профиля
-  useEffect(() => {
-    async function load() {
-      setLoadingProfile(true);
-
-      try {
-        const res = await fetch("/api/profile/me");
-
-        // 🔒 Если админ удалён / отключён → кидаем на логин
-        if (res.status === 401) {
-          window.location.href = "/login";
-          return;
-        }
-
-        let data = null;
-
-        try {
-          data = await res.json();
-        } catch {
-          console.warn("Ответ не JSON");
-        }
-
-        if (!res.ok) {
-          console.error("Ошибка API:", data);
-          return;
-        }
-
-        setProfile(data as ProfileMeResponse);
-      } finally {
-        setLoadingProfile(false);
+      if (!res.ok) {
+        setErr(data.error || "Ошибка входа");
+        return;
       }
+
+      // --- требует 2FA ---
+      if (data.needs2fa) {
+        setTempToken(data.tempToken);
+        setStep("2fa");
+        setTwofaCode("");
+        return;
+      }
+
+      // --- обычный вход ---
+      window.location.href = "/"; // 👈 чтобы точно отработал middleware
+    } catch (e) {
+      setErr("Не удалось подключиться к серверу");
+    } finally {
+      setLoading(false);
     }
+  }
 
-    load();
-  }, []);
+  // ---------- 2FA VERIFY ----------
+  async function verify2fa(e?: React.FormEvent) {
+    e?.preventDefault();
+    if (!twofaCode || loading || twofaCode.length !== 6) return;
 
-  // === Ниже весь остальной код без изменений ===
+    setLoading(true);
+    setErr("");
 
-  const [avatarUploading, setAvatarUploading] = useState(false);
-  const [avatarDeleting, setAvatarDeleting] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [passwordSaving, setPasswordSaving] = useState(false);
-  const [passwordMsg, setPasswordMsg] = useState<string | null>(null);
+    try {
+      const res = await fetch("/api/auth/2fa-verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          token: tempToken,
+          code: twofaCode,
+          trustDevice: true,
+        }),
+      });
 
-  const [qr, setQr] = useState<string | null>(null);
-  const [secret, setSecret] = useState<string | null>(null);
-  const [twoFaStep, setTwoFaStep] =
-    useState<"idle" | "qr" | "confirm">("idle");
-  const [twoFaCode, setTwoFaCode] = useState("");
-  const [twoFaLoading, setTwoFaLoading] = useState(false);
-  const [twoFaMsg, setTwoFaMsg] = useState<string | null>(null);
+      const data = await res.json();
 
-  // === Здесь весь твой UI ===
-  // (я НЕ менял, только загрузку данных выше)
+      if (!res.ok) {
+        setErr(data.error || "Код неверный");
+        return;
+      }
+
+      window.location.href = "/"; // 👈 после успешной 2FA тоже полный переход
+    } catch (e) {
+      setErr("Не удалось подключиться к серверу");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const onSubmit =
+    step === "login"
+      ? (e: React.FormEvent) => handleLogin(e)
+      : (e: React.FormEvent) => verify2fa(e);
 
   return (
-    <div className="space-y-6">
-      {/* ...весь твой JSX как и был... */}
+    <div className="min-h-screen flex items-center justify-center text-slate-50">
+      {/* основной блок логина */}
+      <div className="relative w-full max-w-[520px] mx-4">
+        <form
+          onSubmit={onSubmit}
+          className="relative rounded-[32px] border border-white/10 bg-black/75 backdrop-blur-xl px-8 md:px-10 py-8 md:py-10 shadow-[0_0_60px_rgba(0,0,0,0.9)] space-y-6"
+        >
+          {/* заголовок */}
+          <div className="text-center space-y-1">
+            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">
+              {step === "login" ? "FORUM ADMIN" : "Подтверждение входа"}
+            </h1>
+            <p className="text-xs md:text-sm text-slate-400">
+              {step === "login"
+                ? "Вход в ADMIN-Панель"
+                : "Введите 6-значный код из приложения аутентификации."}
+            </p>
+          </div>
+
+          {/* ошибка */}
+          {err && (
+            <div className="text-xs text-red-400 text-center bg-red-500/10 border border-red-500/40 rounded-2xl px-3 py-2">
+              {err}
+            </div>
+          )}
+
+          {/* шаг 1: логин/пароль */}
+          {step === "login" && (
+            <div className="space-y-4">
+              <div className="space-y-1 text-xs">
+                <label className="block text-slate-400">Логин</label>
+                <input
+                  placeholder="admin"
+                  className="w-full rounded-xl bg-black/60 border border-white/10 px-3 py-2.5 text-sm outline-none focus:border-red-400 focus:ring-1 focus:ring-red-500/40"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  autoComplete="username"
+                />
+              </div>
+
+              <div className="space-y-1 text-xs">
+                <label className="block text-slate-400">Пароль</label>
+                <input
+                  placeholder="••••••••"
+                  type="password"
+                  className="w-full rounded-xl bg-black/60 border border-white/10 px-3 py-2.5 text-sm outline-none focus:border-red-400 focus:ring-1 focus:ring-red-500/40"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* шаг 2: 2FA */}
+          {step === "2fa" && (
+            <div className="space-y-4">
+              <div className="space-y-1 text-xs">
+                <label className="block text-slate-400">
+                  6-значный код из приложения
+                </label>
+                <input
+                  maxLength={6}
+                  className="w-full rounded-xl bg-black/60 border border-white/10 px-3 py-2.5 text-center text-lg tracking-[0.35em] outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-500/40"
+                  value={twofaCode}
+                  onChange={(e) =>
+                    setTwofaCode(e.target.value.replace(/\D/g, ""))
+                  }
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                />
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Открой Google Authenticator, Aegis или другое приложение 2FA
+                  и введи текущий код.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* кнопка */}
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={
+                loading ||
+                (step === "login" && (!username || !password)) ||
+                (step === "2fa" && twofaCode.length !== 6)
+              }
+              className="
+                w-full inline-flex items-center justify-center
+                rounded-2xl px-4 py-2.5 text-sm font-semibold
+                bg-gradient-to-r from-red-500 via-pink-500 to-red-500
+                shadow-[0_0_32px_rgba(248,113,113,0.8)]
+                hover:shadow-[0_0_40px_rgba(248,113,113,1)]
+                transition disabled:opacity-60 disabled:shadow-none
+              "
+            >
+              {loading
+                ? step === "login"
+                  ? "Входим..."
+                  : "Проверяем..."
+                : step === "login"
+                ? "Войти"
+                : "Подтвердить 2FA"}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

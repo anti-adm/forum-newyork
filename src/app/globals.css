@@ -16,7 +16,8 @@ body {
 
 body {
   background-color: #02010a;
-  background-image: url("/bg-lines.svg");
+  /* 👇 новый файл с версией */
+  background-image: url("/bg-lines-v2.svg");
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
@@ -51,9 +52,15 @@ body {
 }
 
 @keyframes devGlow {
-  0%   { box-shadow: 0 0 3px rgba(239, 68, 68, 0.35); }
-  50%  { box-shadow: 0 0 8px rgba(239, 68, 68, 0.55); }
-  100% { box-shadow: 0 0 3px rgba(239, 68, 68, 0.35); }
+  0% {
+    box-shadow: 0 0 3px rgba(239, 68, 68, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.55);
+  }
+  100% {
+    box-shadow: 0 0 3px rgba(239, 68, 68, 0.35);
+  }
 }
 
 /* ===== Chief Administrator — мягкая бирюза ===== */
@@ -62,7 +69,7 @@ body {
   padding: 0.25rem 1rem;
   border-radius: 9999px;
 
-  background: rgba(34, 211, 238, 0.20); /* нежная бирюза */
+  background: rgba(34, 211, 238, 0.2); /* нежная бирюза */
   border: 1px solid rgba(34, 211, 238, 0.45);
 
   color: #dffeff;
@@ -72,9 +79,15 @@ body {
 }
 
 @keyframes headSoftPulse {
-  0%   { box-shadow: 0 0 3px rgba(34, 211, 238, 0.25); }
-  50%  { box-shadow: 0 0 9px rgba(34, 211, 238, 0.45); }
-  100% { box-shadow: 0 0 3px rgba(34, 211, 238, 0.25); }
+  0% {
+    box-shadow: 0 0 3px rgba(34, 211, 238, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 9px rgba(34, 211, 238, 0.45);
+  }
+  100% {
+    box-shadow: 0 0 3px rgba(34, 211, 238, 0.25);
+  }
 }
 
 /* ===== Deputy Chief — мягкий зелёный ===== */
@@ -83,7 +96,7 @@ body {
   padding: 0.25rem 1rem;
   border-radius: 9999px;
 
-  background: rgba(16, 185, 129, 0.20);
+  background: rgba(16, 185, 129, 0.2);
   border: 1px solid rgba(16, 185, 129, 0.45);
 
   color: #e4fff7;
@@ -93,16 +106,24 @@ body {
 }
 
 @keyframes deputySoftPulse {
-  0%   { box-shadow: 0 0 3px rgba(16, 185, 129, 0.25); }
-  50%  { box-shadow: 0 0 9px rgba(16, 185, 129, 0.45); }
-  100% { box-shadow: 0 0 3px rgba(16, 185, 129, 0.25); }
+  0% {
+    box-shadow: 0 0 3px rgba(16, 185, 129, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 9px rgba(16, 185, 129, 0.45);
+  }
+  100% {
+    box-shadow: 0 0 3px rgba(16, 185, 129, 0.25);
+  }
 }
+
 /* CHIEF — обычная стальная бейджка */
+
 .tag-chief {
   padding: 0.25rem 0.9rem;
   border-radius: 9999px;
 
-  background: rgba(59, 130, 246, 0.10); /* лёгкий стальной голубой */
+  background: rgba(59, 130, 246, 0.1); /* лёгкий стальной голубой */
   border: 1px solid rgba(59, 130, 246, 0.45);
 
   color: #e5f2ff;

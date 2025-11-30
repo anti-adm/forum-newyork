@@ -1,4 +1,3 @@
-// src/app/(protected)/profile/page.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -9,7 +8,11 @@ type AdminTagType =
   | "CHEAT_HUNTER"
   | "FORUM"
   | "CHIEF"
-  | "SENIOR";
+  | "CHIEF_CURATOR"
+  | "SENIOR"
+  | "CHIEF_ADMINISTRATOR"
+  | "DEPUTY_CHIEF"
+  | "DEVELOPER";
 
 interface ProfileMeResponse {
   username: string;
@@ -19,18 +22,39 @@ interface ProfileMeResponse {
   twoFactorEnabled: boolean;
 }
 
+/* ============================================================= */
+/*                          TAG STYLES                           */
+/* ============================================================= */
+
 function getTagStyles(tag: AdminTagType) {
   switch (tag) {
     case "LOG_HUNTER":
       return "bg-sky-500/15 border-sky-400/60 text-sky-200";
+
     case "CHEAT_HUNTER":
       return "bg-purple-500/20 border-purple-400/80 text-purple-100";
+
     case "SENIOR":
       return "bg-fuchsia-500/25 border-fuchsia-400/90 text-fuchsia-100";
+
+    case "CHIEF_CURATOR":
+      return "bg-teal-500/15 border-cyan-300/90 text-teal-50";
+
     case "CHIEF":
-      return "bg-teal-500/20 border-teal-400/80 text-teal-100";
+      return "tag-chief";
+
     case "FORUM":
       return "bg-red-500/25 border-red-500/80 text-red-100";
+
+    case "DEVELOPER":
+      return "border-red-500/80 text-red-50 tag-dev";
+
+    case "DEPUTY_CHIEF":
+      return "border-cyan-300/90 text-cyan-50 tag-deputy-head";
+
+    case "CHIEF_ADMINISTRATOR":
+      return "border-sky-300/90 text-sky-50 tag-chief-admin";
+
     case "NONE":
     default:
       return "bg-slate-800/60 border-slate-600/70 text-slate-200";
@@ -45,32 +69,38 @@ function getTagLabel(tag: AdminTagType) {
       return "CheatHunter";
     case "FORUM":
       return "Forum";
-    case "CHIEF":
-      return "Chief";
+    case "CHIEF_CURATOR":
+      return "ChiefCurator";
     case "SENIOR":
       return "Senior";
+    case "DEVELOPER":
+      return "Developer";
+    case "CHIEF_ADMINISTRATOR":
+      return "ChiefAdministrator";
+    case "DEPUTY_CHIEF":
+      return "DeputyChief";
     case "NONE":
     default:
-      return "Без приписки";
+      return "Нет роли";
   }
 }
 
+/* ============================================================= */
+/*                          MAIN PAGE                            */
+/* ============================================================= */
+
 export default function ProfilePage() {
-  // данные профиля
   const [profile, setProfile] = useState<ProfileMeResponse | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
 
-  // аватар
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [avatarDeleting, setAvatarDeleting] = useState(false);
 
-  // пароль
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [passwordSaving, setPasswordSaving] = useState(false);
   const [passwordMsg, setPasswordMsg] = useState<string | null>(null);
 
-  // 2FA
   const [qr, setQr] = useState<string | null>(null);
   const [secret, setSecret] = useState<string | null>(null);
   const [twoFaStep, setTwoFaStep] = useState<"idle" | "qr" | "confirm">("idle");
@@ -78,31 +108,54 @@ export default function ProfilePage() {
   const [twoFaLoading, setTwoFaLoading] = useState(false);
   const [twoFaMsg, setTwoFaMsg] = useState<string | null>(null);
 
-  // загрузка профиля
+  /* ============================================================= */
+  /*                  FIXED PROFILE LOADING + 401                  */
+  /* ============================================================= */
+
   useEffect(() => {
     async function load() {
+      setLoadingProfile(true);
+
       try {
-        setLoadingProfile(true);
         const res = await fetch("/api/profile/me");
-        const data = await res.json();
-        if (!res.ok) {
-          console.error(data);
+
+        // 🔐 Если admin отключён → разлогин сразу
+        if (res.status === 401) {
+          window.location.href = "/login";
           return;
         }
+
+        let data = null;
+
+        // безопасный JSON
+        try {
+          data = await res.json();
+        } catch {
+          console.warn("Ответ сервера не JSON");
+        }
+
+        if (!res.ok) {
+          console.error("Ошибка API:", data);
+          return;
+        }
+
         setProfile(data as ProfileMeResponse);
       } finally {
         setLoadingProfile(false);
       }
     }
+
     load();
   }, []);
 
-  // --- АВАТАР ---
+  /* ============================================================= */
+  /*                           AVATAR                              */
+  /* ============================================================= */
 
   async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (!e.target.files?.[0]) return;
-    const file = e.target.files[0];
 
+    const file = e.target.files[0];
     const form = new FormData();
     form.append("avatar", file);
 
@@ -112,13 +165,16 @@ export default function ProfilePage() {
         method: "POST",
         body: form,
       });
+
       const data = await res.json();
+
       if (!res.ok) {
         alert(data.error || "Не удалось загрузить аватар");
         return;
       }
+
       setProfile((prev) =>
-        prev ? { ...prev, avatarUrl: data.avatarUrl as string } : prev
+        prev ? { ...prev, avatarUrl: data.avatarUrl } : prev
       );
     } finally {
       setAvatarUploading(false);
@@ -128,30 +184,39 @@ export default function ProfilePage() {
 
   async function handleAvatarDelete() {
     if (!confirm("Удалить аватар?")) return;
+
     try {
       setAvatarDeleting(true);
+
       const res = await fetch("/api/profile/avatar", {
         method: "DELETE",
       });
+
       const data = await res.json();
+
       if (!res.ok) {
         alert(data.error || "Не удалось удалить аватар");
         return;
       }
+
       setProfile((prev) => (prev ? { ...prev, avatarUrl: null } : prev));
     } finally {
       setAvatarDeleting(false);
     }
   }
 
-  // --- ПАРОЛЬ ---
+  /* ============================================================= */
+  /*                      PASSWORD CHANGE                          */
+  /* ============================================================= */
 
   async function handlePasswordChange(e: React.FormEvent) {
     e.preventDefault();
+
     if (!currentPassword || !newPassword) {
       setPasswordMsg("Заполни оба поля.");
       return;
     }
+
     try {
       setPasswordSaving(true);
       setPasswordMsg(null);
@@ -166,8 +231,9 @@ export default function ProfilePage() {
       });
 
       const data = await res.json();
+
       if (!res.ok) {
-        setPasswordMsg(data.error || "Ошибка при смене пароля");
+        setPasswordMsg(data.error || "Ошибка изменения пароля");
         return;
       }
 
@@ -179,20 +245,22 @@ export default function ProfilePage() {
     }
   }
 
-  // --- 2FA ---
+  /* ============================================================= */
+  /*                           2FA                                 */
+  /* ============================================================= */
 
   async function start2FA() {
     try {
       setTwoFaLoading(true);
-      setTwoFaMsg(null);
 
       const res = await fetch("/api/profile/2fa/setup", {
         method: "POST",
       });
+
       const data = await res.json();
 
       if (!res.ok) {
-        alert(data.error || "Не удалось начать настройку 2FA");
+        alert(data.error || "Не удалось включить 2FA");
         return;
       }
 
@@ -207,7 +275,6 @@ export default function ProfilePage() {
   async function confirm2FA() {
     try {
       setTwoFaLoading(true);
-      setTwoFaMsg(null);
 
       const res = await fetch("/api/profile/2fa/confirm", {
         method: "POST",
@@ -216,16 +283,18 @@ export default function ProfilePage() {
       });
 
       const data = await res.json();
+
       if (!res.ok) {
         alert(data.error || "Неверный код");
         return;
       }
 
-      setTwoFaMsg("2FA успешно подключено.");
+      setTwoFaMsg("2FA включено.");
       setTwoFaStep("idle");
       setQr(null);
       setSecret(null);
       setTwoFaCode("");
+
       setProfile((prev) =>
         prev ? { ...prev, twoFactorEnabled: true } : prev
       );
@@ -235,19 +304,19 @@ export default function ProfilePage() {
   }
 
   async function disable2FA() {
-    if (!confirm("Отключить двухфакторную аутентификацию?")) return;
+    if (!confirm("Отключить 2FA?")) return;
 
     try {
       setTwoFaLoading(true);
-      setTwoFaMsg(null);
 
       const res = await fetch("/api/profile/2fa/disable", {
         method: "POST",
       });
+
       const data = await res.json();
 
       if (!res.ok) {
-        alert(data.error || "Не удалось отключить 2FA");
+        alert(data.error || "Ошибка отключения 2FA");
         return;
       }
 
@@ -256,6 +325,7 @@ export default function ProfilePage() {
       setQr(null);
       setSecret(null);
       setTwoFaCode("");
+
       setProfile((prev) =>
         prev ? { ...prev, twoFactorEnabled: false } : prev
       );
@@ -264,38 +334,40 @@ export default function ProfilePage() {
     }
   }
 
+  /* ============================================================= */
+  /*                          RENDER                               */
+  /* ============================================================= */
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-1">
         <h1 className="text-xl font-semibold">Профиль</h1>
         <p className="text-xs text-slate-400">
-          Управляй своим аватаром, паролем и двухфакторной аутентификацией.
+          Управляй аватаром, паролем и двухфакторной аутентификацией.
         </p>
       </div>
 
-      {/* --- верхняя карточка профиля: аватар + инфа --- */}
-      <section className="rounded-3xl border border-white/8 bg-black/70 backdrop-blur-xl px-5 md:px-6 py-5 shadow-[0_0_40px_rgba(0,0,0,0.9)] flex flex-col md:flex-row gap-6 md:items-center">
+      {/* === CARD: PROFILE TOP === */}
+      <section className="rounded-3xl border border-white/8 bg-black/70 backdrop-blur-xl px-5 md:px-6 py-5 shadow-lg flex flex-col md:flex-row gap-6 md:items-center">
         <div className="flex items-center gap-4">
-          <div className="h-16 w-16 rounded-full border border-red-500/60 bg-black/80 shadow-[0_0_20px_rgba(248,113,113,0.7)] overflow-hidden flex items-center justify-center text-xl font-semibold text-red-100">
+          <div className="h-16 w-16 rounded-full border border-red-500/60 bg-black/80 shadow-md overflow-hidden flex items-center justify-center text-xl font-semibold text-red-100">
             {profile?.avatarUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={profile.avatarUrl}
-                alt="avatar"
-                className="h-full w-full object-cover"
-              />
+              <img src={profile.avatarUrl} alt="avatar" className="h-full w-full object-cover" />
             ) : (
               (profile?.username?.[0] ?? "A").toUpperCase()
             )}
           </div>
+
           <div>
             <div className="text-sm font-semibold text-slate-50">
               {profile?.username ?? "Загрузка..."}
             </div>
+
             <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px]">
               <span className="px-2 py-0.5 rounded-full bg-white/5 border border-white/20 text-slate-100">
                 {profile?.role ?? "ADMIN"}
               </span>
+
               {profile && (
                 <span
                   className={
@@ -306,34 +378,29 @@ export default function ProfilePage() {
                   {getTagLabel(profile.adminTag)}
                 </span>
               )}
+
               {profile?.twoFactorEnabled && (
-                <span className="px-2 py-0.5 rounded-full border border-emerald-400/70 bg-emerald-500/15 text-emerald-200">
+                <span className="px-2 py-0.5 rounded-full border border-emerald-400/70 bg-emerald-500/15 text-emerald-200 text-[11px]">
                   2FA включена
                 </span>
               )}
             </div>
+
             <p className="mt-2 text-[11px] text-slate-500">
-              Формат PNG/WebP/jpeg.
+              Поддерживаются PNG / WebP / JPG.
             </p>
           </div>
         </div>
 
-        {/* кнопки под аватаром */}
         <div className="flex flex-wrap gap-3 md:ml-auto">
-          <label className="inline-flex items-center justify-center rounded-2xl border border-white/60 bg-black/90 px-4 py-2 text-xs font-semibold text-slate-50 shadow-[0_0_14px_rgba(248,250,252,0.8)] hover:bg-black hover:border-red-400 hover:shadow-[0_0_22px_rgba(248,113,113,0.9)] transition cursor-pointer disabled:opacity-50">
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleAvatarChange}
-              disabled={avatarUploading}
-            />
+          <label className="cursor-pointer inline-flex items-center justify-center rounded-2xl border border-white/60 bg-black/90 px-4 py-2 text-xs font-semibold text-slate-50 shadow-md hover:border-red-400 hover:shadow-red-500/20 transition">
+            <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} disabled={avatarUploading} />
             {avatarUploading ? "Загрузка..." : "Загрузить аватар"}
           </label>
 
           <button
             onClick={handleAvatarDelete}
-            disabled={avatarDeleting || !profile?.avatarUrl}
+            disabled={!profile?.avatarUrl || avatarDeleting}
             className="inline-flex items-center justify-center rounded-2xl border border-red-500/60 bg-red-500/10 px-4 py-2 text-xs font-semibold text-red-200 hover:bg-red-500/20 transition disabled:opacity-40"
           >
             {avatarDeleting ? "Удаляем..." : "Удалить аватар"}
@@ -341,59 +408,53 @@ export default function ProfilePage() {
         </div>
       </section>
 
-      {/* --- смена пароля --- */}
-      <section className="rounded-3xl border border-white/8 bg-black/70 backdrop-blur-xl px-5 md:px-6 py-5 shadow-[0_0_40px_rgba(0,0,0,0.9)] space-y-4">
+      {/* === PASSWORD === */}
+      <section className="rounded-3xl border border-white/8 bg-black/70 backdrop-blur-xl px-5 py-5 shadow-lg space-y-4">
         <h2 className="text-sm font-semibold text-slate-50">Смена пароля</h2>
-        <form
-          onSubmit={handlePasswordChange}
-          className="grid gap-3 md:grid-cols-2 md:gap-4 text-xs"
-        >
+
+        <form onSubmit={handlePasswordChange} className="grid gap-3 md:grid-cols-2 text-xs">
           <div className="space-y-1.5">
-            <label className="block text-slate-400">Текущий пароль</label>
+            <label className="text-slate-400">Текущий пароль</label>
             <input
               type="password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              className="w-full rounded-xl bg-black/60 border border-white/10 px-3 py-2.5 text-sm outline-none focus:border-red-400 focus:ring-1 focus:ring-red-500/40"
+              className="w-full rounded-xl bg-black/60 border border-white/10 px-3 py-2.5 text-sm outline-none focus:border-red-400"
             />
           </div>
+
           <div className="space-y-1.5">
-            <label className="block text-slate-400">Новый пароль</label>
+            <label className="text-slate-400">Новый пароль</label>
             <input
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full rounded-xl bg-black/60 border border-white/10 px-3 py-2.5 text-sm outline-none focus:border-red-400 focus:ring-1 focus:ring-red-500/40"
+              className="w-full rounded-xl bg-black/60 border border-white/10 px-3 py-2.5 text-sm outline-none focus:border-red-400"
             />
           </div>
-          <div className="md:col-span-2 flex items-center justify-between pt-1">
-            <p className="text-[11px] text-slate-500">
-              Не делись паролем ни с кем, даже с куратором.
-            </p>
+
+          <div className="md:col-span-2 flex justify-between items-center">
+            <p className="text-[11px] text-slate-500">Не делись паролем ни с кем.</p>
+
             <button
               type="submit"
               disabled={passwordSaving}
-              className="inline-flex items-center rounded-2xl border border_WHITE/60 bg-black/90 px-4 py-2 text-xs font-semibold text-slate-50 shadow-[0_0_14px_rgba(248,250,252,0.8)] hover:bg-black hover:border-red-400 hover:shadow-[0_0_22px_rgba(248,113,113,0.9)] transition disabled:opacity-50"
+              className="px-4 py-2 rounded-2xl border border-white/60 bg-black/90 text-slate-50 text-xs shadow-md hover:border-red-400 transition disabled:opacity-40"
             >
               {passwordSaving ? "Сохраняем..." : "Сохранить пароль"}
             </button>
           </div>
         </form>
-        {passwordMsg && (
-          <p className="text-[11px] text-slate-300 mt-1">{passwordMsg}</p>
-        )}
+
+        {passwordMsg && <p className="text-[11px] text-slate-300">{passwordMsg}</p>}
       </section>
 
-      {/* --- 2FA --- */}
-      <section className="rounded-3xl border border-white/8 bg-black/70 backdrop-blur-xl px-5 md:px-6 py-5 shadow-[0_0_40px_rgba(0,0,0,0.9)] space-y-4">
-        <div className="flex items-center justify-between gap-3">
+      {/* === 2FA === */}
+      <section className="rounded-3xl border border-white/8 bg-black/70 backdrop-blur-xl px-5 py-5 shadow-lg space-y-4">
+        <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-sm font-semibold text-slate-50">
-              Двухфакторная аутентификация (2FA)
-            </h2>
-            <p className="text-xs text-slate-400 mt-1">
-              Привяжи Google Authenticator, чтобы защитить вход в админ-панель.
-            </p>
+            <h2 className="text-sm font-semibold text-slate-50">Двухфакторная аутентификация</h2>
+            <p className="text-xs text-slate-400 mt-1">Google Authenticator или Aegis.</p>
           </div>
 
           {profile?.twoFactorEnabled && (
@@ -401,11 +462,11 @@ export default function ProfilePage() {
               <span className="px-2 py-0.5 rounded-full border border-emerald-400/70 bg-emerald-500/15 text-[11px] text-emerald-200">
                 Уже включена
               </span>
+
               <button
-                type="button"
                 onClick={disable2FA}
                 disabled={twoFaLoading}
-                className="text-[11px] px-3 py-1.5 rounded-xl border border-red-500/60 text-red-200 bg-red-500/10 hover:bg-red-500/20 transition disabled:opacity-50"
+                className="text-[11px] px-3 py-1.5 rounded-xl border border-red-500/60 text-red-200 bg-red-500/10 hover:bg-red-500/20 transition"
               >
                 Отключить
               </button>
@@ -413,50 +474,38 @@ export default function ProfilePage() {
           )}
         </div>
 
-        {/* старт */}
-        {twoFaStep === "idle" && !qr && !profile?.twoFactorEnabled && (
+        {twoFaStep === "idle" && !profile?.twoFactorEnabled && (
           <button
             onClick={start2FA}
             disabled={twoFaLoading}
-            className="mt-2 inline-flex items-center rounded-2xl border border-white/60 bg-black/90 px-4 py-2 text-xs font-semibold text-slate-50 shadow-[0_0_14px_rgba(248,113,113,0.45)] hover:bg-black hover:border-red-400 hover:shadow-[0_0_22px_rgba(248,113,113,0.9)] transition disabled:opacity-50"
+            className="px-4 py-2 rounded-2xl border border-white/60 bg-black/90 text-xs font-semibold text-slate-50 shadow-md hover:border-red-400 transition disabled:opacity-40"
           >
-            {twoFaLoading ? "Подготавливаем..." : "Включить 2FA"}
+            {twoFaLoading ? "Подготовка..." : "Включить 2FA"}
           </button>
         )}
 
-        {/* QR */}
         {twoFaStep === "qr" && qr && (
-          <div className="mt-3 grid gap-4 md:grid-cols-[auto,1fr] items-center">
-            <div className="flex flex-col items-center gap-2">
+          <div className="grid md:grid-cols-[auto,1fr] gap-4 items-center">
+            <div className="flex flex-col items-center">
               <div className="rounded-2xl border border-white/10 bg-black/80 p-3">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={qr}
-                  alt="QR code"
-                  className="w-40 h-40 md:w-48 md:h-48 rounded-xl"
-                />
+                <img src={qr} alt="QR" className="w-48 h-48 rounded-xl" />
               </div>
-              <span className="text-[11px] text-slate-500">
-                Отсканируй в Google Authenticator
-              </span>
+              <span className="text-[11px] text-slate-500 mt-2">Сканируй в Authenticator</span>
             </div>
 
             <div className="space-y-3 text-xs text-slate-300">
-              <p>
-                1. Открой приложение{" "}
-                <span className="font-semibold">Google Authenticator</span> /
-                Aegis / Authy.
-              </p>
-              <p>2. Добавь новый аккаунт и отсканируй QR-код слева.</p>
+              <p>1. Открой приложение Google Authenticator / Aegis.</p>
+              <p>2. Добавь новый аккаунт сканировав QR.</p>
+
               <p className="text-[11px] text-slate-500">
-                Если камера недоступна, введи секрет вручную:
+                Если не сканируется — введи вручную:
                 <br />
                 <span className="text-slate-200 break-all">{secret}</span>
               </p>
 
               <button
                 onClick={() => setTwoFaStep("confirm")}
-                className="inline-flex items-center rounded-2xl border border-white/40 px-4 py-2 text-[11px] font-semibold text-slate-100 hover:bg-white/5 transition"
+                className="px-4 py-2 rounded-2xl border border-white/40 text-[11px] font-semibold text-slate-100 hover:bg-white/5 transition"
               >
                 Далее — ввести код
               </button>
@@ -464,36 +513,30 @@ export default function ProfilePage() {
           </div>
         )}
 
-        {/* ввод кода */}
         {twoFaStep === "confirm" && (
-          <div className="mt-3 space-y-3">
-            <p className="text-xs text-slate-400">
-              Введи 6-значный код из приложения аутентификации.
-            </p>
-            <div className="flex flex-wrap items-center gap-3">
+          <div className="space-y-3">
+            <p className="text-xs text-slate-400">Введите 6-значный код:</p>
+
+            <div className="flex gap-3">
               <input
-                value={twoFaCode}
-                onChange={(e) =>
-                  setTwoFaCode(e.target.value.replace(/\D/g, ""))
-                }
                 maxLength={6}
-                className="w-32 px-3 py-2 rounded-xl bg-black/60 border border-white/15 text-center text-lg tracking-[0.35em] text-slate-50 outline-none focus:border-red-400 focus:ring-1 focus:ring-red-500/40"
-                placeholder="••••••"
+                value={twoFaCode}
+                onChange={(e) => setTwoFaCode(e.target.value.replace(/\D/g, ""))}
+                className="w-32 px-3 py-2 rounded-xl bg-black/60 border border-white/15 text-center text-lg tracking-widest text-slate-50 outline-none"
               />
+
               <button
                 onClick={confirm2FA}
                 disabled={twoFaLoading || twoFaCode.length < 6}
-                className="inline-flex items-center rounded-2xl border border-white/60 bg-black/90 px-4 py-2 text-xs font-semibold text-slate-50 shadow-[0_0_14px_rgba(34,197,94,0.55)] hover:bg-black hover:border-green-400 hover:shadow-[0_0_22px_rgba(34,197,94,0.9)] transition disabled:opacity-50"
+                className="px-4 py-2 rounded-2xl border border-white/60 bg-black/90 text-xs font-semibold shadow-md hover:border-green-400 transition disabled:opacity-40"
               >
-                {twoFaLoading ? "Проверяем..." : "Подтвердить код"}
+                {twoFaLoading ? "Проверяем..." : "Подтвердить"}
               </button>
             </div>
           </div>
         )}
 
-        {twoFaMsg && (
-          <p className="mt-2 text-[11px] text-emerald-400">{twoFaMsg}</p>
-        )}
+        {twoFaMsg && <p className="text-[11px] text-emerald-400">{twoFaMsg}</p>}
       </section>
 
       {loadingProfile && (

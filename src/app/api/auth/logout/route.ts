@@ -1,9 +1,14 @@
 // src/app/api/auth/logout/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { clearAuthCookie } from '@/lib/auth';
+import { NextResponse } from "next/server";
+import { clearAuthCookie } from "@/lib/auth";
 
-export async function POST(_req: NextRequest) {
+export const runtime = "nodejs";
+
+export async function POST() {
   const res = NextResponse.json({ ok: true });
+
+  // сносим JWT-куку
   clearAuthCookie(res);
+
   return res;
 }

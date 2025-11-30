@@ -10,7 +10,11 @@ type AdminTagType =
   | "CHEAT_HUNTER"
   | "FORUM"
   | "CHIEF"
-  | "SENIOR";
+  | "CHIEF_CURATOR"
+  | "SENIOR"
+  | "CHIEF_ADMINISTRATOR"
+  | "DEPUTY_CHIEF"
+  | "DEVELOPER";
 
 interface AdminUser {
   id: number;
@@ -32,6 +36,37 @@ interface AdminLogItem {
   createdAt: string;
 }
 
+// аккуратно вынесем стили тегов
+function getTagStyles(tag: AdminTagType) {
+  switch (tag) {
+    case "LOG_HUNTER":
+      return "bg-sky-500/15 border-sky-400/60 text-sky-200";
+    case "CHEAT_HUNTER":
+      return "bg-purple-500/20 border-purple-400/80 text-purple-100";
+    case "SENIOR":
+      return "bg-fuchsia-500/25 border-fuchsia-400/90 text-fuchsia-100";
+    case "CHIEF_CURATOR":
+      return "bg-teal-500/15 border-teal-400/80 text-teal-50";
+    case "FORUM":
+      return "bg-red-500/25 border-red-500/80 text-red-100";
+    case "CHIEF":
+      // старый Chief — обычный неон, без анимаций
+      return "bg-emerald-500/15 border-emerald-400/70 text-emerald-100";
+    case "DEVELOPER":
+      // 🔴 аккуратный, но заметный красный
+      return "tag-dev border border-red-500/70 text-red-50";
+    case "DEPUTY_CHIEF":
+      // 🌊 морской
+      return "tag-deputy-head border border-cyan-300/70 text-cyan-50";
+    case "CHIEF_ADMINISTRATOR":
+      // 💎 бирюзовый
+      return "tag-chief-admin border border-sky-300/70 text-sky-50";
+    case "NONE":
+    default:
+      return "bg-slate-800/60 border-slate-600/70 text-slate-200";
+  }
+}
+
 export default function SettingsPage() {
   const [dailyNorm, setDailyNorm] = useState("");
   const [normLoading, setNormLoading] = useState(false);
@@ -47,29 +82,13 @@ export default function SettingsPage() {
   const [logs, setLogs] = useState<AdminLogItem[]>([]);
   const [logsLoading, setLogsLoading] = useState(false);
 
-  function getTagStyles(tag: AdminTagType) {
-    switch (tag) {
-      case "LOG_HUNTER":
-        return "bg-sky-500/15 border-sky-400/60 text-sky-200";
-      case "CHEAT_HUNTER":
-        return "bg-purple-500/20 border-purple-400/80 text-purple-100";
-      case "SENIOR":
-        return "bg-fuchsia-500/25 border-fuchsia-400/90 text-fuchsia-100";
-      case "CHIEF":
-        return "bg-teal-500/20 border-teal-400/80 text-teal-100";
-      case "FORUM":
-        return "bg-red-500/25 border-red-500/80 text-red-100";
-      case "NONE":
-      default:
-        return "bg-slate-800/60 border-slate-600/70 text-slate-200";
-    }
-  }
-
   useEffect(() => {
     loadNorm();
     loadAdmins();
     loadLogs();
   }, []);
+
+  // ===== НОРМА =====
 
   async function loadNorm() {
     setNormLoading(true);
@@ -100,6 +119,8 @@ export default function SettingsPage() {
       setNormLoading(false);
     }
   }
+
+  // ===== АДМИНЫ =====
 
   async function loadAdmins() {
     setAdminsLoading(true);
@@ -175,6 +196,8 @@ export default function SettingsPage() {
     await loadAdmins();
   }
 
+  // ===== ЛОГИ =====
+
   async function loadLogs() {
     setLogsLoading(true);
     try {
@@ -190,6 +213,7 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6">
+      {/* Заголовок */}
       <div className="flex flex-col gap-1">
         <h1 className="text-xl font-semibold">Настройки супер-админа</h1>
         <p className="text-xs text-slate-400">
@@ -197,7 +221,7 @@ export default function SettingsPage() {
         </p>
       </div>
 
-      {/* НОРМА */}
+      {/* ===== НОРМА ===== */}
       <section className="rounded-3xl border border-white/8 bg-black/70 backdrop-blur-xl px-5 md:px-6 py-5 shadow-[0_0_40px_rgba(0,0,0,0.9)] space-y-4">
         <h2 className="text-sm font-semibold text-slate-50">
           Сегодняшняя норма
@@ -234,7 +258,7 @@ export default function SettingsPage() {
         </form>
       </section>
 
-      {/* АДМИНЫ */}
+      {/* ===== АДМИНЫ ===== */}
       <section className="rounded-3xl border border-white/8 bg-black/70 backdrop-blur-xl px-5 md:px-6 py-5 shadow-[0_0_40px_rgba(0,0,0,0.9)] space-y-4">
         <h2 className="text-sm font-semibold">Управление администраторами</h2>
 
@@ -281,6 +305,10 @@ export default function SettingsPage() {
               <option value="CHEAT_HUNTER">CheatHunter</option>
               <option value="SENIOR">Senior</option>
               <option value="CHIEF">Chief</option>
+              <option value="CHIEF_ADMINISTRATOR">ChiefAdministrator</option>
+              <option value="DEPUTY_CHIEF">DeputyChief</option>
+              <option value="DEVELOPER">Developer</option>
+              <option value="CHIEF_CURATOR">ChiefCurator</option>
               <option value="FORUM">Forum</option>
             </select>
           </div>
@@ -385,7 +413,7 @@ export default function SettingsPage() {
                 </tr>
               ))}
 
-              {admins.length === 0 && (
+              {admins.length === 0 && !adminsLoading && (
                 <tr>
                   <td
                     colSpan={5}
@@ -400,7 +428,7 @@ export default function SettingsPage() {
         </div>
       </section>
 
-      {/* ЛОГИ */}
+      {/* ===== ЛОГИ ===== */}
       <section className="rounded-3xl border border-white/8 bg-black/70 backdrop-blur-xl px-5 md:px-6 py-5 shadow-[0_0_40px_rgba(0,0,0,0.9)] space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold">Журнал действий админов</h2>

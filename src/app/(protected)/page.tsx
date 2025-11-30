@@ -46,7 +46,7 @@ export default async function DashboardPage() {
           </span>
         </h1>
         <p className="text-xs text-slate-400">
-          Следи за своей активностью и дневной нормой жалоб.
+          Следи за своей активностью и дневной нормой форумных жалоб.
         </p>
       </div>
 
@@ -123,7 +123,7 @@ export default async function DashboardPage() {
                   <td className="pr-4 text-slate-200">{p.staticId}</td>
 
                   <td className="pr-4 text-slate-300">
-                    {p.duration > 0 ? `${p.duration} мин` : "—"}
+                    {p.duration > 0 ? `${p.duration} ` : "—"}
                   </td>
 
                   <td className="pr-4 text-slate-300">{p.complaintCode}</td>

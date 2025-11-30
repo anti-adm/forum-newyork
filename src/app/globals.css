@@ -12,11 +12,10 @@ body {
   padding: 0;
 }
 
-/* Чёрный фон + аккуратные неоновые линии по краям */
+/* ======= БАЗОВЫЙ ФОН ======= */
 
 body {
-  background-color: #02010a; /* глубокий тёмный */
-
+  background-color: #02010a;
   background-image: url("/bg-lines.svg");
   background-repeat: no-repeat;
   background-position: center center;
@@ -24,10 +23,88 @@ body {
   background-attachment: fixed;
 
   color: #e5e7eb;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Text',
-    'Segoe UI', sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Segoe UI", sans-serif;
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* ===================================== */
+/*      МЯГКИЕ АННИМИРОВАННЫЕ ТЕГИ       */
+/* ===================================== */
+
+/* ===== Developer — мягкий красный ===== */
+
+.tag-dev {
+  padding: 0.25rem 0.9rem;
+  border-radius: 9999px;
+
+  background: rgba(239, 68, 68, 0.18); /* лёгкий красный */
+  border: 1px solid rgba(239, 68, 68, 0.4);
+
+  color: #ffecec;
+  text-shadow: 0 0 3px rgba(239, 68, 68, 0.45);
+
+  animation: devGlow 8s ease-in-out infinite;
+}
+
+@keyframes devGlow {
+  0%   { box-shadow: 0 0 3px rgba(239, 68, 68, 0.35); }
+  50%  { box-shadow: 0 0 8px rgba(239, 68, 68, 0.55); }
+  100% { box-shadow: 0 0 3px rgba(239, 68, 68, 0.35); }
+}
+
+/* ===== Chief Administrator — мягкая бирюза ===== */
+
+.tag-chief-admin {
+  padding: 0.25rem 1rem;
+  border-radius: 9999px;
+
+  background: rgba(34, 211, 238, 0.20); /* нежная бирюза */
+  border: 1px solid rgba(34, 211, 238, 0.45);
+
+  color: #dffeff;
+  text-shadow: 0 0 3px rgba(34, 211, 238, 0.35);
+
+  animation: headSoftPulse 8s ease-in-out infinite;
+}
+
+@keyframes headSoftPulse {
+  0%   { box-shadow: 0 0 3px rgba(34, 211, 238, 0.25); }
+  50%  { box-shadow: 0 0 9px rgba(34, 211, 238, 0.45); }
+  100% { box-shadow: 0 0 3px rgba(34, 211, 238, 0.25); }
+}
+
+/* ===== Deputy Chief — мягкий зелёный ===== */
+
+.tag-deputy-head {
+  padding: 0.25rem 1rem;
+  border-radius: 9999px;
+
+  background: rgba(16, 185, 129, 0.20);
+  border: 1px solid rgba(16, 185, 129, 0.45);
+
+  color: #e4fff7;
+  text-shadow: 0 0 3px rgba(16, 185, 129, 0.35);
+
+  animation: deputySoftPulse 8s ease-in-out infinite;
+}
+
+@keyframes deputySoftPulse {
+  0%   { box-shadow: 0 0 3px rgba(16, 185, 129, 0.25); }
+  50%  { box-shadow: 0 0 9px rgba(16, 185, 129, 0.45); }
+  100% { box-shadow: 0 0 3px rgba(16, 185, 129, 0.25); }
+}
+/* CHIEF — обычная стальная бейджка */
+.tag-chief {
+  padding: 0.25rem 0.9rem;
+  border-radius: 9999px;
+
+  background: rgba(59, 130, 246, 0.10); /* лёгкий стальной голубой */
+  border: 1px solid rgba(59, 130, 246, 0.45);
+
+  color: #e5f2ff;
+  text-shadow: 0 0 2px rgba(59, 130, 246, 0.25);
 }

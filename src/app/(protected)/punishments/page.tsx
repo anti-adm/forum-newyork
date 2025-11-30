@@ -15,14 +15,15 @@ type Punishment = {
   createdAt?: string;
 };
 
-type PunishmentType = "mute" | "ajail" | "warn" | "ban" | "hardban";
+type PunishmentType = "mute" | "ajail" | "warn" | "ban" | "hardban" | "gunban";
 
 const TYPES: { value: PunishmentType; label: string }[] = [
   { value: "mute", label: "mute" },
   { value: "ajail", label: "ajail" },
   { value: "warn", label: "warn" },
   { value: "ban", label: "ban" },
-  { value: "hardban", label: "hard Ban" },
+  { value: "hardban", label: "hardban" },
+  { value: "gunban", label: "gunban" },
 ];
 
 export default function PunishmentsPage() {
@@ -55,11 +56,14 @@ export default function PunishmentsPage() {
 
         const list: Punishment[] = data.punishments ?? data ?? [];
         setPunishments(list);
-        setCommands(
-          (list || [])
-            .map((p) => p.command)
-            .filter((c): c is string => Boolean(c))
-        );
+
+        // БОЛЬШЕ НЕ ЗАПОЛНЯЕМ commands ИЗ ИСТОРИИ
+        // setCommands(
+        //   (list || [])
+        //     .map((p) => p.command)
+        //     .filter((c): c is string => Boolean(c))
+        // );
+
         if (data.lastComplaintCode) {
           setLastComplaintCode(data.lastComplaintCode);
         }
@@ -77,7 +81,10 @@ export default function PunishmentsPage() {
     e.preventDefault();
     setError(null);
 
-    if (!form.staticId.trim() || !form.complaintCode.trim()) {
+    // нормализуем код жалобы
+    const normalizedComplaintCode = form.complaintCode.trim().toUpperCase();
+
+    if (!form.staticId.trim() || !normalizedComplaintCode) {
       setError("Нужно указать Static ID и код жалобы");
       return;
     }
@@ -87,7 +94,10 @@ export default function PunishmentsPage() {
       const res = await fetch("/api/punishments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          complaintCode: normalizedComplaintCode,
+        }),
       });
       const data = await res.json();
 
@@ -99,7 +109,7 @@ export default function PunishmentsPage() {
 
         setPunishments((prev) => [punishment, ...prev].slice(0, 50));
         setCommands((prev) => [command, ...prev].slice(0, 50));
-        setLastComplaintCode(form.complaintCode);
+        setLastComplaintCode(normalizedComplaintCode);
 
         setForm((prev) => ({
           ...prev,
@@ -217,7 +227,7 @@ export default function PunishmentsPage() {
 
               {/* duration */}
               <div className="space-y-1.5 text-xs">
-                <label className="block text-slate-400">Длительность (мин)</label>
+                <label className="block text-slate-400">Мера наказания</label>
                 <input
                   value={form.duration}
                   onChange={(e) =>
@@ -235,7 +245,7 @@ export default function PunishmentsPage() {
 
               {/* complaint code */}
               <div className="space-y-1.5 text-xs">
-                <label className="block text-slate-400">Код жалобы</label>
+                <label className="block text-slate-400">Номер жалобы</label>
                 <input
                   value={form.complaintCode}
                   onChange={(e) =>
@@ -281,6 +291,7 @@ export default function PunishmentsPage() {
                 Сгенерированные команды
               </p>
               <div className="flex gap-2">
+                {/* Кнопки справа */}
                 <button
                   onClick={copyAll}
                   className="inline-flex items-center rounded-xl px-3 py-1.5 text-[11px] font-semibold
@@ -303,17 +314,15 @@ export default function PunishmentsPage() {
               </div>
             </div>
 
-                <textarea
-                  className="mt-2 min-h-[260px] w-full flex-1 rounded-xl border border-white/10 bg-black/70 px-3 py-2.5
+            <textarea
+              className="mt-2 min-h-[260px] w-full flex-1 rounded-xl border border-white/10 bg-black/70 px-3 py-2.5
                             text-xs text-slate-50 outline-none
                             focus:border-red-400 focus:ring-1 focus:ring-red-500/40"
-                  value={commands.join("\n")}
-                  onChange={(e) => handleCommandsChange(e.target.value)}
-                  placeholder="Команды можно подкорректировать вручную перед копированием."
-                />
-            <p className="mt-2 text-[11px] text-slate-500">
-            
-            </p>
+              value={commands.join("\n")}
+              onChange={(e) => handleCommandsChange(e.target.value)}
+              placeholder="Команды можно подкорректировать вручную перед копированием."
+            />
+            <p className="mt-2 text-[11px] text-slate-500"></p>
           </div>
         </div>
       </div>
@@ -338,7 +347,7 @@ export default function PunishmentsPage() {
               {punishments.map((p) => (
                 <tr
                   key={p.id}
-                  className="bg-black/80 transition-colors hover:bg-black"
+                  className="transition-colors hover:bg-white/5"
                 >
                   <td className="px-2 py-1">
                     <span className="rounded-full border border-red-500/40 bg-red-500/10 px-2 py-0.5 font-mono text-[11px] text-red-200">
@@ -347,7 +356,7 @@ export default function PunishmentsPage() {
                   </td>
                   <td className="px-2 py-1 text-slate-100">{p.staticId}</td>
                   <td className="px-2 py-1 text-slate-100">
-                    {p.type === "warn" ? "—" : `${p.duration} мин`}
+                    {p.type === "warn" ? "—" : `${p.duration} `}
                   </td>
                   <td className="px-2 py-1 text-slate-100">
                     {p.complaintCode}

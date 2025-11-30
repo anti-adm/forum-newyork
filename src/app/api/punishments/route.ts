@@ -1,27 +1,31 @@
 // src/app/api/punishments/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getAuthPayloadFromCookies } from '@/lib/auth';
-import { logAdminAction } from '@/lib/log';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getAuthPayloadFromCookies } from "@/lib/auth";
+import { logAdminAction } from "@/lib/log";
+
+type PunishmentType = "ajail" | "mute" | "warn" | "ban" | "hardban" | "gunban";
 
 function buildCommand(
-  type: string,
+  type: PunishmentType,
   staticId: number,
   duration: number,
-  complaintCode: string,
+  complaintCode: string
 ): string {
-  const c = complaintCode ? `Жалоба ${complaintCode}` : '';
+  const c = complaintCode ? `Жалоба ${complaintCode}` : "";
   switch (type) {
-    case 'ajail':
+    case "ajail":
       return `/ajail ${staticId} ${duration} ${c}`.trim();
-    case 'mute':
+    case "mute":
       return `/mute ${staticId} ${duration} ${c}`.trim();
-    case 'warn':
+    case "warn":
       return `/warn ${staticId} ${c}`.trim();
-    case 'ban':
+    case "ban":
       return `/ban ${staticId} ${duration} ${c}`.trim();
-    case 'hardban':
+    case "hardban":
       return `/hardban ${staticId} ${duration} ${c}`.trim();
+    case "gunban":
+      return `/gunban ${staticId} ${duration} ${c}`.trim();
     default:
       return `/warn ${staticId} ${c}`.trim();
   }
@@ -30,14 +34,14 @@ function buildCommand(
 export async function GET(req: NextRequest) {
   const auth = await getAuthPayloadFromCookies();
   if (!auth) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { searchParams } = new URL(req.url);
-  const adminIdParam = searchParams.get('adminId');
+  const adminIdParam = searchParams.get("adminId");
 
   let adminId = auth.userId;
-  if (auth.role === 'SUPERADMIN' && adminIdParam) {
+  if (auth.role === "SUPERADMIN" && adminIdParam) {
     const parsed = Number(adminIdParam);
     if (!Number.isNaN(parsed)) {
       adminId = parsed;
@@ -48,7 +52,7 @@ export async function GET(req: NextRequest) {
     prisma.user.findUnique({ where: { id: adminId } }),
     prisma.punishment.findMany({
       where: { adminId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       take: 50,
     }),
   ]);
@@ -62,54 +66,70 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const auth = await getAuthPayloadFromCookies();
   if (!auth) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const body = await req.json();
-  const { type, staticId, duration, complaintCode, issued } = body;
+  const { type, staticId, duration, complaintCode, issued } = body as {
+    type?: string;
+    staticId?: string | number;
+    duration?: string | number;
+    complaintCode?: string;
+    issued?: boolean;
+  };
 
-  if (!type || !staticId || !complaintCode) {
+  // нормализуем код жалобы (обрезаем пробелы и приводим к верхнему регистру)
+  const normalizedComplaintCode = (complaintCode ?? "").trim().toUpperCase();
+
+  if (!type || !staticId || !normalizedComplaintCode) {
     return NextResponse.json(
-      { error: 'Заполните тип, staticId и код жалобы' },
-      { status: 400 },
+      { error: "Заполните тип, staticId и код жалобы" },
+      { status: 400 }
     );
   }
 
-  const validTypes = ['ajail', 'mute', 'warn', 'ban', 'hardban'];
-  if (!validTypes.includes(type)) {
+  const validTypes: PunishmentType[] = [
+    "ajail",
+    "mute",
+    "warn",
+    "ban",
+    "hardban",
+    "gunban",
+  ];
+  if (!validTypes.includes(type as PunishmentType)) {
     return NextResponse.json(
-      { error: 'Недопустимый тип наказания' },
-      { status: 400 },
+      { error: "Недопустимый тип наказания" },
+      { status: 400 }
     );
   }
 
   const parsedStaticId = Number(staticId);
   if (!Number.isInteger(parsedStaticId) || parsedStaticId <= 0) {
     return NextResponse.json(
-      { error: 'staticId должен быть положительным числом' },
-      { status: 400 },
+      { error: "staticId должен быть положительным числом" },
+      { status: 400 }
     );
   }
 
   let finalDuration = 0;
-  let durationUnit = 'NONE';
-  if (type !== 'warn') {
+  let durationUnit = "NONE";
+  if (type !== "warn") {
     const d = Number(duration);
     if (!Number.isInteger(d) || d <= 0) {
       return NextResponse.json(
-        { error: 'Продолжительность должна быть положительным числом' },
-        { status: 400 },
+        { error: "Продолжительность должна быть положительным числом" },
+        { status: 400 }
       );
     }
     finalDuration = d;
-    durationUnit = 'MINUTES';
+    durationUnit = "MINUTES";
   }
 
   const command = buildCommand(
-    type,
+    type as PunishmentType,
     parsedStaticId,
     finalDuration,
-    complaintCode,
+    normalizedComplaintCode
   );
 
   const punishment = await prisma.punishment.create({
@@ -119,7 +139,7 @@ export async function POST(req: NextRequest) {
       staticId: parsedStaticId,
       duration: finalDuration,
       durationUnit,
-      complaintCode,
+      complaintCode: normalizedComplaintCode,
       issued: Boolean(issued),
       command,
     },
@@ -128,15 +148,15 @@ export async function POST(req: NextRequest) {
   await prisma.user.update({
     where: { id: auth.userId },
     data: {
-      lastComplaintCode: complaintCode,
+      lastComplaintCode: normalizedComplaintCode,
       lastComplaintUpdatedAt: new Date(),
     },
   });
 
   await logAdminAction(
     auth.userId,
-    'CREATE_PUNISHMENT',
-    `punishmentId=${punishment.id}; type=${type}; staticId=${parsedStaticId}`,
+    "CREATE_PUNISHMENT",
+    `punishmentId=${punishment.id}; type=${type}; staticId=${parsedStaticId}`
   );
 
   return NextResponse.json({ punishment, command });

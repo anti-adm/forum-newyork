@@ -35,7 +35,7 @@ model Punishment {
   id            Int      @id @default(autoincrement())
   adminId       Int
   admin         User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
-  type          String   // 'ajail' | 'mute' | 'warn' | 'ban' | 'hardban'
+  type          String   // 'ajail' | 'mute' | 'warn' | 'ban' | 'hardban' | 'gunban'
   staticId      Int
   duration      Int      // в минутах (0 для warn)
   durationUnit  String   // 'MINUTES' | 'NONE'

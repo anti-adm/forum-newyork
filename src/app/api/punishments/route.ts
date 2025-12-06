@@ -57,9 +57,15 @@ export async function GET(req: NextRequest) {
     }),
   ]);
 
+  // команды только по НЕ выданным наказаниям
+  const commands = (punishments || [])
+    .filter((p) => !p.issued && p.command)
+    .map((p) => p.command as string);
+
   return NextResponse.json({
     punishments,
     lastComplaintCode: user?.lastComplaintCode ?? null,
+    commands,
   });
 }
 
@@ -78,7 +84,6 @@ export async function POST(req: NextRequest) {
     issued?: boolean;
   };
 
-  // нормализуем код жалобы (обрезаем пробелы и приводим к верхнему регистру)
   const normalizedComplaintCode = (complaintCode ?? "").trim().toUpperCase();
 
   if (!type || !staticId || !normalizedComplaintCode) {
@@ -160,4 +165,19 @@ export async function POST(req: NextRequest) {
   );
 
   return NextResponse.json({ punishment, command });
+}
+
+// ОЧИСТКА СПИСКА КОМАНД: пометить ВСЕ невыданные наказания как issued
+export async function DELETE() {
+  const auth = await getAuthPayloadFromCookies();
+  if (!auth) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const result = await prisma.punishment.updateMany({
+    where: { adminId: auth.userId, issued: false },
+    data: { issued: true },
+  });
+
+  return NextResponse.json({ updated: result.count });
 }

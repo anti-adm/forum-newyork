@@ -17,12 +17,15 @@ model User {
   isActive               Boolean    @default(true)
   isSystem               Boolean    @default(false)
 
-  adminTag           String   @default("NONE")
-  avatarUrl      String?
-  
-  twoFactorEnabled  Boolean @default(false)
-  twoFactorSecret   String?
-  twoFactorConfirmed Boolean @default(false)
+  adminTag               String     @default("NONE")
+  avatarUrl              String?
+
+  twoFactorEnabled       Boolean    @default(false)
+  twoFactorSecret        String?
+  twoFactorConfirmed     Boolean    @default(false)
+
+  // 🔥 НОВОЕ ПОЛЕ — форумный ник администратора
+  forumNick              String?    // ник на форуме Majestic, null если не указан
 
   lastComplaintCode      String?
   lastComplaintUpdatedAt DateTime?

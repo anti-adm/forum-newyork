@@ -20,6 +20,7 @@ interface ProfileMeResponse {
   adminTag: AdminTagType;
   avatarUrl: string | null;
   twoFactorEnabled: boolean;
+  forumNick: string | null;
 }
 
 /* ============================================================= */
@@ -85,9 +86,7 @@ function getTagLabel(tag: AdminTagType) {
   }
 }
 
-/* ============================================================= */
-/*                          MAIN PAGE                            */
-/* ============================================================= */
+
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<ProfileMeResponse | null>(null);
@@ -108,9 +107,11 @@ export default function ProfilePage() {
   const [twoFaLoading, setTwoFaLoading] = useState(false);
   const [twoFaMsg, setTwoFaMsg] = useState<string | null>(null);
 
-  /* ============================================================= */
-  /*                  FIXED PROFILE LOADING + 401                  */
-  /* ============================================================= */
+  const [forumNickDraft, setForumNickDraft] = useState("");
+  const [forumNickSaving, setForumNickSaving] = useState(false);
+  const [forumNickMsg, setForumNickMsg] = useState<string | null>(null);
+
+
 
   useEffect(() => {
     async function load() {
@@ -125,7 +126,7 @@ export default function ProfilePage() {
           return;
         }
 
-        let data = null;
+        let data: any = null;
 
         // безопасный JSON
         try {
@@ -139,7 +140,9 @@ export default function ProfilePage() {
           return;
         }
 
-        setProfile(data as ProfileMeResponse);
+        const prof = data as ProfileMeResponse;
+        setProfile(prof);
+        setForumNickDraft(prof.forumNick ?? "");
       } finally {
         setLoadingProfile(false);
       }
@@ -148,9 +151,7 @@ export default function ProfilePage() {
     load();
   }, []);
 
-  /* ============================================================= */
-  /*                           AVATAR                              */
-  /* ============================================================= */
+
 
   async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (!e.target.files?.[0]) return;
@@ -202,6 +203,53 @@ export default function ProfilePage() {
       setProfile((prev) => (prev ? { ...prev, avatarUrl: null } : prev));
     } finally {
       setAvatarDeleting(false);
+    }
+  }
+
+
+
+  async function handleForumNickSave(e: React.FormEvent) {
+    e.preventDefault();
+
+    const trimmed = forumNickDraft.trim();
+    if (!trimmed) {
+      setForumNickMsg("Ник не может быть пустым.");
+      return;
+    }
+
+    try {
+      setForumNickSaving(true);
+      setForumNickMsg(null);
+
+      const res = await fetch("/api/profile/forum-nick", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ forumNick: trimmed }),
+      });
+
+      let data: any = null;
+      try {
+        data = await res.json();
+      } catch {
+
+      }
+
+      if (!res.ok) {
+        setForumNickMsg(
+          (data && data.error) || "Не удалось сохранить форумный ник."
+        );
+        return;
+      }
+
+      const savedNick = data?.forumNick ?? trimmed;
+
+      setProfile((prev) =>
+        prev ? { ...prev, forumNick: savedNick } : prev
+      );
+      setForumNickDraft(savedNick);
+      setForumNickMsg("Форумный ник сохранён.");
+    } finally {
+      setForumNickSaving(false);
     }
   }
 
@@ -343,7 +391,8 @@ export default function ProfilePage() {
       <div className="flex flex-col gap-1">
         <h1 className="text-xl font-semibold">Профиль</h1>
         <p className="text-xs text-slate-400">
-          Управляй аватаром, паролем и двухфакторной аутентификацией.
+          Управляй аватаром, паролем, двухфакторной защитой и форумным ником
+          для автозаполнения статистики.
         </p>
       </div>
 
@@ -352,7 +401,11 @@ export default function ProfilePage() {
         <div className="flex items-center gap-4">
           <div className="h-16 w-16 rounded-full border border-red-500/60 bg-black/80 shadow-md overflow-hidden flex items-center justify-center text-xl font-semibold text-red-100">
             {profile?.avatarUrl ? (
-              <img src={profile.avatarUrl} alt="avatar" className="h-full w-full object-cover" />
+              <img
+                src={profile.avatarUrl}
+                alt="avatar"
+                className="h-full w-full object-cover"
+              />
             ) : (
               (profile?.username?.[0] ?? "A").toUpperCase()
             )}
@@ -394,7 +447,13 @@ export default function ProfilePage() {
 
         <div className="flex flex-wrap gap-3 md:ml-auto">
           <label className="cursor-pointer inline-flex items-center justify-center rounded-2xl border border-white/60 bg-black/90 px-4 py-2 text-xs font-semibold text-slate-50 shadow-md hover:border-red-400 hover:shadow-red-500/20 transition">
-            <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} disabled={avatarUploading} />
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleAvatarChange}
+              disabled={avatarUploading}
+            />
             {avatarUploading ? "Загрузка..." : "Загрузить аватар"}
           </label>
 
@@ -408,11 +467,64 @@ export default function ProfilePage() {
         </div>
       </section>
 
+      {/* === FORUM NICK === */}
+      <section className="rounded-3xl border border-white/8 bg-black/70 backdrop-blur-xl px-5 py-5 shadow-lg space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-semibold text-slate-50">
+              Форумный ник
+            </h2>
+            <p className="text-xs text-slate-400 mt-1">
+              Ник на форуме Majestic (точно как в профиле).
+            </p>
+          </div>
+
+          {profile?.forumNick && (
+            <span className="px-2 py-0.5 rounded-full border border-white/15 bg-white/5 text-[11px] text-slate-200">
+              Текущее значение: {profile.forumNick}
+            </span>
+          )}
+        </div>
+
+        <form
+          onSubmit={handleForumNickSave}
+          className="flex flex-col md:flex-row gap-3 text-xs md:items-center"
+        >
+          <div className="flex-1 space-y-1.5">
+            <label className="text-slate-400 text-[11px]">
+              
+            </label>
+            <input
+              type="text"
+              value={forumNickDraft}
+              onChange={(e) => setForumNickDraft(e.target.value)}
+              className="w-full rounded-xl bg-black/60 border border-white/10 px-3 py-2.5 text-sm outline-none focus:border-red-400"
+              placeholder="Например: anti. или sheriff"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={forumNickSaving}
+            className="md:self-end px-4 py-2 rounded-2xl border border-white/60 bg-black/90 text-slate-50 text-xs font-semibold shadow-md hover:border-red-400 transition disabled:opacity-40"
+          >
+            {forumNickSaving ? "Сохраняем..." : "Сохранить ник"}
+          </button>
+        </form>
+
+        {forumNickMsg && (
+          <p className="text-[11px] text-slate-300">{forumNickMsg}</p>
+        )}
+      </section>
+
       {/* === PASSWORD === */}
       <section className="rounded-3xl border border-white/8 bg-black/70 backdrop-blur-xl px-5 py-5 shadow-lg space-y-4">
         <h2 className="text-sm font-semibold text-slate-50">Смена пароля</h2>
 
-        <form onSubmit={handlePasswordChange} className="grid gap-3 md:grid-cols-2 text-xs">
+        <form
+          onSubmit={handlePasswordChange}
+          className="grid gap-3 md:grid-cols-2 text-xs"
+        >
           <div className="space-y-1.5">
             <label className="text-slate-400">Текущий пароль</label>
             <input
@@ -434,7 +546,9 @@ export default function ProfilePage() {
           </div>
 
           <div className="md:col-span-2 flex justify-between items-center">
-            <p className="text-[11px] text-slate-500">Не делись паролем ни с кем.</p>
+            <p className="text-[11px] text-slate-500">
+              Не делись паролем ни с кем.
+            </p>
 
             <button
               type="submit"
@@ -446,15 +560,21 @@ export default function ProfilePage() {
           </div>
         </form>
 
-        {passwordMsg && <p className="text-[11px] text-slate-300">{passwordMsg}</p>}
+        {passwordMsg && (
+          <p className="text-[11px] text-slate-300">{passwordMsg}</p>
+        )}
       </section>
 
       {/* === 2FA === */}
       <section className="rounded-3xl border border-white/8 bg-black/70 backdrop-blur-xl px-5 py-5 shadow-lg space-y-4">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-sm font-semibold text-slate-50">Двухфакторная аутентификация</h2>
-            <p className="text-xs text-slate-400 mt-1">Google Authenticator или Aegis.</p>
+            <h2 className="text-sm font-semibold text-slate-50">
+              Двухфакторная аутентификация
+            </h2>
+            <p className="text-xs text-slate-400 mt-1">
+              Google Authenticator или Aegis.
+            </p>
           </div>
 
           {profile?.twoFactorEnabled && (
@@ -490,7 +610,9 @@ export default function ProfilePage() {
               <div className="rounded-2xl border border-white/10 bg-black/80 p-3">
                 <img src={qr} alt="QR" className="w-48 h-48 rounded-xl" />
               </div>
-              <span className="text-[11px] text-slate-500 mt-2">Сканируй в Authenticator</span>
+              <span className="text-[11px] text-slate-500 mt-2">
+                Сканируй в Authenticator
+              </span>
             </div>
 
             <div className="space-y-3 text-xs text-slate-300">
@@ -515,13 +637,17 @@ export default function ProfilePage() {
 
         {twoFaStep === "confirm" && (
           <div className="space-y-3">
-            <p className="text-xs text-slate-400">Введите 6-значный код:</p>
+            <p className="text-xs text-slate-400">
+              Введите 6-значный код:
+            </p>
 
             <div className="flex gap-3">
               <input
                 maxLength={6}
                 value={twoFaCode}
-                onChange={(e) => setTwoFaCode(e.target.value.replace(/\D/g, ""))}
+                onChange={(e) =>
+                  setTwoFaCode(e.target.value.replace(/\D/g, ""))
+                }
                 className="w-32 px-3 py-2 rounded-xl bg-black/60 border border-white/15 text-center text-lg tracking-widest text-slate-50 outline-none"
               />
 
@@ -536,7 +662,9 @@ export default function ProfilePage() {
           </div>
         )}
 
-        {twoFaMsg && <p className="text-[11px] text-emerald-400">{twoFaMsg}</p>}
+        {twoFaMsg && (
+          <p className="text-[11px] text-emerald-400">{twoFaMsg}</p>
+        )}
       </section>
 
       {loadingProfile && (

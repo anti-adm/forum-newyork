@@ -1,0 +1,22 @@
+{
+  "threadId": 2700510,
+  "threadTitle": "trikkil-0227",
+  "threadUrl": "https://forum.majestic-rp.ru/threads/trikkil-0227.2700510/",
+  "complaint": {
+    "author": ".Alaska.",
+    "text": "-_-"
+  },
+  "reply": {
+    "author": "Trikkil",
+    "text": "Приветствую,\nИгрок #133802  получает 10 дней ban'a за 1.20 ПГО.\nЗакрыто."
+  },
+  "parsedPunishment": {
+    "rawText": "Приветствую,\nИгрок #133802  получает 10 дней ban'a за 1.20 ПГО.\nЗакрыто.",
+    "staticId": 133802,
+    "duration": null,
+    "type": "ban",
+    "complaintCode": "trikkil-0227",
+    "command": "/ban 133802 Жалоба trikkil-0227"
+  },
+  "fetchedAt": "2025-12-05T19:59:13.990Z"
+}

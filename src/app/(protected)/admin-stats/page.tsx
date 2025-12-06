@@ -1,4 +1,4 @@
-// src/app/(protected)/admin-stats/page.tsx
+
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
@@ -55,7 +55,7 @@ export default async function AdminStatsPage(props: {
     redirect("/");
   }
 
-  // 🔹 Достаём searchParams через await
+
   const searchParams = await props.searchParams;
 
   // --- sort tab: day / week / month ---
@@ -63,7 +63,7 @@ export default async function AdminStatsPage(props: {
   const sortBy: "day" | "week" | "month" =
     sortRaw === "week" || sortRaw === "month" ? sortRaw : "day";
 
-  // --- базовые данные: админы + дневная норма ---
+
   const [admins, dailyNormSetting] = await Promise.all([
     prisma.user.findMany({
       where: { isActive: true },
@@ -84,7 +84,7 @@ export default async function AdminStatsPage(props: {
     startOfMonth(),
   ];
 
-  // --- основная статистика: сегодня / неделя / месяц ---
+
   const statsRaw = await Promise.all(
     admins.map(
       async (
@@ -122,14 +122,14 @@ export default async function AdminStatsPage(props: {
     )
   );
 
-  // сортировка по активному табу
+
   const stats = [...statsRaw].sort((a, b) => {
     if (sortBy === "week") return b.week - a.week;
     if (sortBy === "month") return b.month - a.month;
     return b.day - a.day;
   });
 
-  // --- диапазон дат (фильтр) ---
+
 
   const defaultFrom = startOfMonth();
   const defaultTo = startOfDay();
@@ -165,7 +165,7 @@ export default async function AdminStatsPage(props: {
     (a, b) => b.count - a.count || a.admin.username.localeCompare(b.admin.username)
   );
 
-  // подпись и цель для шкалы в зависимости от сортировки
+
   const progressLabel =
     sortBy === "week"
       ? "Прогресс нормы — неделя"
@@ -178,7 +178,7 @@ export default async function AdminStatsPage(props: {
 
   return (
     <div className="space-y-6">
-      {/* заголовок + табы */}
+
       <div className="flex flex-col gap-3">
         <div>
           <h1 className="text-xl font-semibold">Статистика админов</h1>
@@ -284,7 +284,7 @@ export default async function AdminStatsPage(props: {
         </table>
       </div>
 
-      {/* БЛОК: СТАТИСТИКА ПО ДИАПАЗОНУ ДАТ */}
+
       <section className="rounded-3xl border border-white/8 bg-black/70 backdrop-blur-xl px-5 md:px-6 py-5 shadow-[0_0_40px_rgba(0,0,0,0.9)] space-y-4 text-xs">
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
@@ -301,7 +301,7 @@ export default async function AdminStatsPage(props: {
             method="GET"
             className="flex flex-wrap items-end gap-3 text-[11px]"
           >
-            {/* сохраняем активный таб при сабмите */}
+
             <input type="hidden" name="sort" value={sortBy} />
             <div className="flex flex-col gap-1">
               <label className="text-slate-400">С даты</label>

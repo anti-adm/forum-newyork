@@ -1,0 +1,138 @@
+{
+  "generatedAt": "2025-12-06T13:32:26.865Z",
+  "total": 11,
+  "inReview": 9,
+  "open": 1,
+  "request84": 1,
+  "items": [
+    {
+      "threadId": 2702462,
+      "title": "дм",
+      "url": "https://forum.majestic-rp.ru/threads/dm.2702462/",
+      "status": "in_review",
+      "complaintAuthor": "ggvp1123",
+      "complaintText": "дм",
+      "adminMark": {
+        "author": ".belissimo",
+        "text": "На рассмотрении."
+      }
+    },
+    {
+      "threadId": 2702425,
+      "title": "ДМ",
+      "url": "https://forum.majestic-rp.ru/threads/dm.2702425/",
+      "status": "in_review",
+      "complaintAuthor": "nedoslov",
+      "complaintText": "ДМ без причины",
+      "adminMark": {
+        "author": ".belissimo",
+        "text": "На рассмотрении."
+      }
+    },
+    {
+      "threadId": 2702398,
+      "title": "дм",
+      "url": "https://forum.majestic-rp.ru/threads/dm.2702398/",
+      "status": "in_review",
+      "complaintAuthor": "Shket0",
+      "complaintText": "дм",
+      "adminMark": {
+        "author": "milgrif",
+        "text": "На рассмотрении"
+      }
+    },
+    {
+      "threadId": 2702323,
+      "title": "нон рп гос",
+      "url": "https://forum.majestic-rp.ru/threads/non-rp-gos.2702323/",
+      "status": "open",
+      "complaintAuthor": "jamal23",
+      "complaintText": "не озвучили статью при задержании",
+      "adminMark": null
+    },
+    {
+      "threadId": 2702301,
+      "title": "Выход во время РП",
+      "url": "https://forum.majestic-rp.ru/threads/vykhod-vo-vremya-rp.2702301/",
+      "status": "in_review",
+      "complaintAuthor": "Dzen Zima",
+      "complaintText": "Рассмотрите жалобу",
+      "adminMark": {
+        "author": "Dzen Zima",
+        "text": "Рассмотрите жалобу"
+      }
+    },
+    {
+      "threadId": 2702275,
+      "title": "Жалоба на #198173",
+      "url": "https://forum.majestic-rp.ru/threads/zhaloba-na-198173.2702275/",
+      "status": "in_review",
+      "complaintAuthor": "Chex86_",
+      "complaintText": "Жалоба на #198173",
+      "adminMark": {
+        "author": "milgrif",
+        "text": "На рассмотрении"
+      }
+    },
+    {
+      "threadId": 2702264,
+      "title": "угроза в реальной жизни",
+      "url": "https://forum.majestic-rp.ru/threads/ugroza-v-real-noi-zhizni.2702264/",
+      "status": "in_review",
+      "complaintAuthor": "kakondik108",
+      "complaintText": "угроза в реальной жизни",
+      "adminMark": {
+        "author": "milgrif",
+        "text": "На рассмотрении"
+      }
+    },
+    {
+      "threadId": 2702043,
+      "title": "6.13 опп",
+      "url": "https://forum.majestic-rp.ru/threads/6-13-opp.2702043/",
+      "status": "in_review",
+      "complaintAuthor": "vicor ich",
+      "complaintText": "типок про мой язык говорит",
+      "adminMark": {
+        "author": "milgrif",
+        "text": "На рассмотрении"
+      }
+    },
+    {
+      "threadId": 2700132,
+      "title": "Дб",
+      "url": "https://forum.majestic-rp.ru/threads/db.2700132/",
+      "status": "in_review",
+      "complaintAuthor": "rebzzya",
+      "complaintText": "требую соответствующее наказание о_0",
+      "adminMark": {
+        "author": "Igor/",
+        "text": "На рассмотрении."
+      }
+    },
+    {
+      "threadId": 2700125,
+      "title": "ДМ",
+      "url": "https://forum.majestic-rp.ru/threads/dm.2700125/",
+      "status": "in_review",
+      "complaintAuthor": "Timofei Akrapovich",
+      "complaintText": "-",
+      "adminMark": {
+        "author": "Igor/",
+        "text": "На рассмотрении."
+      }
+    },
+    {
+      "threadId": 2698760,
+      "title": "жалоба на 3040",
+      "url": "https://forum.majestic-rp.ru/threads/zhaloba-na-3040.2698760/",
+      "status": "request_84",
+      "complaintAuthor": "OrestSalamanca",
+      "complaintText": "Мой статик 50560 Статик нарушителя 3040 Дата 04.12.2025 Время 16.28",
+      "adminMark": {
+        "author": "tonight/",
+        "text": "На рассмотрении."
+      }
+    }
+  ]
+}

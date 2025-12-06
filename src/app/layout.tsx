@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Admin панель",
-  description: "Управление RP-проектом",
+  title: "Forum панель",
+  description: "Адаптивная панель работы с форумом",
 };
 
 export default function RootLayout({

@@ -36,7 +36,7 @@ interface AdminLogItem {
   createdAt: string;
 }
 
-// аккуратно вынесем стили тегов
+
 function getTagStyles(tag: AdminTagType) {
   switch (tag) {
     case "LOG_HUNTER":
@@ -50,16 +50,16 @@ function getTagStyles(tag: AdminTagType) {
     case "FORUM":
       return "bg-red-500/25 border-red-500/80 text-red-100";
     case "CHIEF":
-      // старый Chief — обычный неон, без анимаций
+
       return "bg-emerald-500/15 border-emerald-400/70 text-emerald-100";
     case "DEVELOPER":
-      // 🔴 аккуратный, но заметный красный
+
       return "tag-dev border border-red-500/70 text-red-50";
     case "DEPUTY_CHIEF":
-      // 🌊 морской
+
       return "tag-deputy-head border border-cyan-300/70 text-cyan-50";
     case "CHIEF_ADMINISTRATOR":
-      // 💎 бирюзовый
+
       return "tag-chief-admin border border-sky-300/70 text-sky-50";
     case "NONE":
     default:
@@ -88,7 +88,7 @@ export default function SettingsPage() {
     loadLogs();
   }, []);
 
-  // ===== НОРМА =====
+
 
   async function loadNorm() {
     setNormLoading(true);
@@ -120,7 +120,7 @@ export default function SettingsPage() {
     }
   }
 
-  // ===== АДМИНЫ =====
+
 
   async function loadAdmins() {
     setAdminsLoading(true);
@@ -213,7 +213,7 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Заголовок */}
+
       <div className="flex flex-col gap-1">
         <h1 className="text-xl font-semibold">Настройки супер-админа</h1>
         <p className="text-xs text-slate-400">
@@ -221,7 +221,7 @@ export default function SettingsPage() {
         </p>
       </div>
 
-      {/* ===== НОРМА ===== */}
+
       <section className="rounded-3xl border border-white/8 bg-black/70 backdrop-blur-xl px-5 md:px-6 py-5 shadow-[0_0_40px_rgba(0,0,0,0.9)] space-y-4">
         <h2 className="text-sm font-semibold text-slate-50">
           Сегодняшняя норма
@@ -233,7 +233,7 @@ export default function SettingsPage() {
         >
           <div className="space-y-1.5 text-xs">
             <label className="block text-slate-400">
-              Кол-во наказаний в день
+              Кол-во жалоб в день
             </label>
             <input
               value={dailyNorm}
@@ -258,11 +258,11 @@ export default function SettingsPage() {
         </form>
       </section>
 
-      {/* ===== АДМИНЫ ===== */}
+
       <section className="rounded-3xl border border-white/8 bg-black/70 backdrop-blur-xl px-5 md:px-6 py-5 shadow-[0_0_40px_rgba(0,0,0,0.9)] space-y-4">
         <h2 className="text-sm font-semibold">Управление администраторами</h2>
 
-        {/* создание админа */}
+
         <form
           onSubmit={createAdmin}
           className="grid gap-3 md:grid-cols-[1.5fr,150px,150px,auto]"
@@ -277,7 +277,7 @@ export default function SettingsPage() {
             />
           </div>
 
-          {/* роль */}
+
           <div className="space-y-1.5 text-xs">
             <label className="block text-slate-400">Роль</label>
             <select
@@ -292,7 +292,7 @@ export default function SettingsPage() {
             </select>
           </div>
 
-          {/* тег */}
+
           <div className="space-y-1.5 text-xs">
             <label className="block text-slate-400">Тег администратора</label>
             <select
@@ -313,7 +313,7 @@ export default function SettingsPage() {
             </select>
           </div>
 
-          {/* кнопка */}
+
           <div className="flex items-end">
             <button
               type="submit"

@@ -17,11 +17,13 @@ body {
 body {
   background-color: #02010a;
   /* 👇 новый файл с версией */
-  background-image: url("/bg-lines-v2.svg");
+  background-image: url("/bg-lines-v3.png");
+  background-size: auto;
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
   background-attachment: fixed;
+  background-color: #000;
 
   color: #e5e7eb;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",

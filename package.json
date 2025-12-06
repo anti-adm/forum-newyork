@@ -10,13 +10,19 @@
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",
+    "axios": "^1.13.2",
+    "axios-cookiejar-support": "^6.0.5",
+    "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
+    "cheerio": "^1.1.2",
     "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.556.0",
     "next": "16.0.5",
     "qrcode": "^1.5.4",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "speakeasy": "^2.0.0"
+    "speakeasy": "^2.0.0",
+    "tough-cookie": "^6.0.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

@@ -221,7 +221,7 @@ export default function SettingsClient() {
         <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
           <div>
             <label className="mb-1 block text-xs text-slate-400">
-              Кол-во наказаний в день
+              Кол-во жалоб в день
             </label>
             <input
               className="w-32 rounded-lg border border-slate-700 bg-black/80 px-3 py-2 text-sm text-slate-50 outline-none transition focus:border-slate-100 focus:shadow-[0_0_10px_rgba(248,250,252,0.7)]"

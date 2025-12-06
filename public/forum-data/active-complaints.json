@@ -1,32 +1,119 @@
 {
-  "generatedAt": "2025-12-06T13:32:26.865Z",
-  "total": 11,
-  "inReview": 9,
-  "open": 1,
+  "generatedAt": "2025-12-06T15:30:40.587Z",
+  "total": 12,
+  "inReview": 8,
+  "open": 3,
   "request84": 1,
   "items": [
     {
-      "threadId": 2702462,
-      "title": "дм",
-      "url": "https://forum.majestic-rp.ru/threads/dm.2702462/",
+      "threadId": 2702791,
+      "title": "вышал из игры",
+      "url": "https://forum.majestic-rp.ru/threads/vyshal-iz-igry.2702791/",
+      "status": "open",
+      "complaintAuthor": "allog1307gmail.com",
+      "complaintText": "вышел с игры после смерти",
+      "adminMark": null
+    },
+    {
+      "threadId": 2702783,
+      "title": "DM",
+      "url": "https://forum.majestic-rp.ru/threads/dm.2702783/",
+      "status": "open",
+      "complaintAuthor": "Ridi",
+      "complaintText": "DM",
+      "adminMark": null
+    },
+    {
+      "threadId": 2702769,
+      "title": "выдал орм без причины+пг",
+      "url": "https://forum.majestic-rp.ru/threads/vydal-orm-bez-prichiny-pg.2702769/",
+      "status": "open",
+      "complaintAuthor": "allog1307gmail.com",
+      "complaintText": "выдал орм и пг",
+      "adminMark": null
+    },
+    {
+      "threadId": 2702728,
+      "title": "Drive-By",
+      "url": "https://forum.majestic-rp.ru/threads/drive-by.2702728/",
       "status": "in_review",
-      "complaintAuthor": "ggvp1123",
-      "complaintText": "дм",
+      "complaintAuthor": "Blake Seventy Four",
+      "complaintText": "Drive-By",
       "adminMark": {
-        "author": ".belissimo",
-        "text": "На рассмотрении."
+        "author": "Simbochka.",
+        "text": "Тема закрыта на рассмотрении администрацией."
       }
     },
     {
-      "threadId": 2702425,
-      "title": "ДМ",
-      "url": "https://forum.majestic-rp.ru/threads/dm.2702425/",
+      "threadId": 2702725,
+      "title": "жалоба на 191202",
+      "url": "https://forum.majestic-rp.ru/threads/zhaloba-na-191202.2702725/",
       "status": "in_review",
-      "complaintAuthor": "nedoslov",
-      "complaintText": "ДМ без причины",
+      "complaintAuthor": "Gafar777",
+      "complaintText": "сидит матом ругается",
       "adminMark": {
-        "author": ".belissimo",
-        "text": "На рассмотрении."
+        "author": "Simbochka.",
+        "text": "Тема закрыта на рассмотрении администрацией."
+      }
+    },
+    {
+      "threadId": 2702718,
+      "title": "ДМ",
+      "url": "https://forum.majestic-rp.ru/threads/dm.2702718/",
+      "status": "in_review",
+      "complaintAuthor": "naBloke",
+      "complaintText": ".",
+      "adminMark": {
+        "author": "Simbochka.",
+        "text": "Тема закрыта на рассмотрении администрацией."
+      }
+    },
+    {
+      "threadId": 2702696,
+      "title": "НОНрп",
+      "url": "https://forum.majestic-rp.ru/threads/nonrp.2702696/",
+      "status": "in_review",
+      "complaintAuthor": "Rifatnuk",
+      "complaintText": "НОНрп",
+      "adminMark": {
+        "author": "Simbochka.",
+        "text": "Тема закрыта на рассмотрении администрацией."
+      }
+    },
+    {
+      "threadId": 2702593,
+      "title": "Дм",
+      "url": "https://forum.majestic-rp.ru/threads/dm.2702593/",
+      "status": "in_review",
+      "complaintAuthor": "Bebross",
+      "complaintText": "Дм",
+      "adminMark": {
+        "author": "milgrif",
+        "text": "На рассмотрении"
+      }
+    },
+    {
+      "threadId": 2702557,
+      "title": "игнорирование отыгровки в do",
+      "url": "https://forum.majestic-rp.ru/threads/ignorirovaniye-otygrovki-v-do.2702557/",
+      "status": "in_review",
+      "complaintAuthor": "Gokuro_Sakugawa",
+      "complaintText": "",
+      "adminMark": {
+        "author": "milgrif",
+        "text": "На рассмотрении"
+      }
+    },
+    {
+      "threadId": 2702538,
+      "title": "Жалоба",
+      "url": "https://forum.majestic-rp.ru/threads/zhaloba.2702538/",
+      "status": "in_review",
+      "complaintAuthor": "Leki3452",
+      "complaintText": "тип подрезал а потом и вовсе вышел в троих",
+      "adminMark": {
+        "author": "milgrif",
+        "text": "На рассмотрении"
       }
     },
     {
@@ -39,87 +126,6 @@
       "adminMark": {
         "author": "milgrif",
         "text": "На рассмотрении"
-      }
-    },
-    {
-      "threadId": 2702323,
-      "title": "нон рп гос",
-      "url": "https://forum.majestic-rp.ru/threads/non-rp-gos.2702323/",
-      "status": "open",
-      "complaintAuthor": "jamal23",
-      "complaintText": "не озвучили статью при задержании",
-      "adminMark": null
-    },
-    {
-      "threadId": 2702301,
-      "title": "Выход во время РП",
-      "url": "https://forum.majestic-rp.ru/threads/vykhod-vo-vremya-rp.2702301/",
-      "status": "in_review",
-      "complaintAuthor": "Dzen Zima",
-      "complaintText": "Рассмотрите жалобу",
-      "adminMark": {
-        "author": "Dzen Zima",
-        "text": "Рассмотрите жалобу"
-      }
-    },
-    {
-      "threadId": 2702275,
-      "title": "Жалоба на #198173",
-      "url": "https://forum.majestic-rp.ru/threads/zhaloba-na-198173.2702275/",
-      "status": "in_review",
-      "complaintAuthor": "Chex86_",
-      "complaintText": "Жалоба на #198173",
-      "adminMark": {
-        "author": "milgrif",
-        "text": "На рассмотрении"
-      }
-    },
-    {
-      "threadId": 2702264,
-      "title": "угроза в реальной жизни",
-      "url": "https://forum.majestic-rp.ru/threads/ugroza-v-real-noi-zhizni.2702264/",
-      "status": "in_review",
-      "complaintAuthor": "kakondik108",
-      "complaintText": "угроза в реальной жизни",
-      "adminMark": {
-        "author": "milgrif",
-        "text": "На рассмотрении"
-      }
-    },
-    {
-      "threadId": 2702043,
-      "title": "6.13 опп",
-      "url": "https://forum.majestic-rp.ru/threads/6-13-opp.2702043/",
-      "status": "in_review",
-      "complaintAuthor": "vicor ich",
-      "complaintText": "типок про мой язык говорит",
-      "adminMark": {
-        "author": "milgrif",
-        "text": "На рассмотрении"
-      }
-    },
-    {
-      "threadId": 2700132,
-      "title": "Дб",
-      "url": "https://forum.majestic-rp.ru/threads/db.2700132/",
-      "status": "in_review",
-      "complaintAuthor": "rebzzya",
-      "complaintText": "требую соответствующее наказание о_0",
-      "adminMark": {
-        "author": "Igor/",
-        "text": "На рассмотрении."
-      }
-    },
-    {
-      "threadId": 2700125,
-      "title": "ДМ",
-      "url": "https://forum.majestic-rp.ru/threads/dm.2700125/",
-      "status": "in_review",
-      "complaintAuthor": "Timofei Akrapovich",
-      "complaintText": "-",
-      "adminMark": {
-        "author": "Igor/",
-        "text": "На рассмотрении."
       }
     },
     {

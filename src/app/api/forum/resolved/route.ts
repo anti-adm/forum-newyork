@@ -61,8 +61,11 @@ export async function POST(req: Request) {
 
   // 3) ищем админа по forumNick
   const admin = await prisma.user.findFirst({
-    where: { forumNick: adminForumName },
-    select: { id: true, username: true },
+      where: {
+          forumNick: {
+              equals: adminForumName
+          }
+      },
   });
 
   if (!admin) {

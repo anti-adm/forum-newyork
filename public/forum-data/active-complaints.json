@@ -1,142 +1,94 @@
 {
-  "generatedAt": "2025-12-06T15:30:40.587Z",
-  "total": 12,
-  "inReview": 8,
+  "generatedAt": "2025-12-06T21:34:48.814Z",
+  "total": 8,
+  "inReview": 5,
   "open": 3,
-  "request84": 1,
+  "request84": 0,
   "items": [
     {
-      "threadId": 2702791,
-      "title": "вышал из игры",
-      "url": "https://forum.majestic-rp.ru/threads/vyshal-iz-igry.2702791/",
+      "threadId": 2704106,
+      "title": "дм+мг",
+      "url": "https://forum.majestic-rp.ru/threads/dm-mg.2704106",
       "status": "open",
-      "complaintAuthor": "allog1307gmail.com",
-      "complaintText": "вышел с игры после смерти",
+      "complaintAuthor": "Vlad Hellhaund",
+      "complaintText": "дм",
       "adminMark": null
     },
     {
-      "threadId": 2702783,
-      "title": "DM",
-      "url": "https://forum.majestic-rp.ru/threads/dm.2702783/",
+      "threadId": 2704102,
+      "title": "нрп гос",
+      "url": "https://forum.majestic-rp.ru/threads/nrp-gos.2704102",
       "status": "open",
-      "complaintAuthor": "Ridi",
-      "complaintText": "DM",
+      "complaintAuthor": "alekseimaistrenko9@gmail.",
+      "complaintText": "нрп гос",
       "adminMark": null
     },
     {
-      "threadId": 2702769,
-      "title": "выдал орм без причины+пг",
-      "url": "https://forum.majestic-rp.ru/threads/vydal-orm-bez-prichiny-pg.2702769/",
+      "threadId": 2704094,
+      "title": "за шо",
+      "url": "https://forum.majestic-rp.ru/threads/za-sho.2704094",
       "status": "open",
-      "complaintAuthor": "allog1307gmail.com",
-      "complaintText": "выдал орм и пг",
+      "complaintAuthor": "Ksovelit",
+      "complaintText": ".",
       "adminMark": null
     },
     {
-      "threadId": 2702728,
-      "title": "Drive-By",
-      "url": "https://forum.majestic-rp.ru/threads/drive-by.2702728/",
+      "threadId": 2704064,
+      "title": "ужос",
+      "url": "https://forum.majestic-rp.ru/threads/uzhos.2704064",
       "status": "in_review",
-      "complaintAuthor": "Blake Seventy Four",
-      "complaintText": "Drive-By",
-      "adminMark": {
-        "author": "Simbochka.",
-        "text": "Тема закрыта на рассмотрении администрацией."
-      }
-    },
-    {
-      "threadId": 2702725,
-      "title": "жалоба на 191202",
-      "url": "https://forum.majestic-rp.ru/threads/zhaloba-na-191202.2702725/",
-      "status": "in_review",
-      "complaintAuthor": "Gafar777",
-      "complaintText": "сидит матом ругается",
-      "adminMark": {
-        "author": "Simbochka.",
-        "text": "Тема закрыта на рассмотрении администрацией."
-      }
-    },
-    {
-      "threadId": 2702718,
-      "title": "ДМ",
-      "url": "https://forum.majestic-rp.ru/threads/dm.2702718/",
-      "status": "in_review",
-      "complaintAuthor": "naBloke",
+      "complaintAuthor": "Ksovelit",
       "complaintText": ".",
       "adminMark": {
-        "author": "Simbochka.",
+        "author": "stevenson/",
+        "text": "На рассмотрении администрацией."
+      }
+    },
+    {
+      "threadId": 2704027,
+      "title": "DM без причины",
+      "url": "https://forum.majestic-rp.ru/threads/dm-bez-prichiny.2704027",
+      "status": "in_review",
+      "complaintAuthor": "Renegation",
+      "complaintText": ".",
+      "adminMark": {
+        "author": "Mashiro.",
         "text": "Тема закрыта на рассмотрении администрацией."
       }
     },
     {
-      "threadId": 2702696,
-      "title": "НОНрп",
-      "url": "https://forum.majestic-rp.ru/threads/nonrp.2702696/",
+      "threadId": 2703971,
+      "title": "1.23.2 пго",
+      "url": "https://forum.majestic-rp.ru/threads/1-23-2-pgo.2703971",
       "status": "in_review",
-      "complaintAuthor": "Rifatnuk",
-      "complaintText": "НОНрп",
+      "complaintAuthor": "sspepega",
+      "complaintText": "1",
       "adminMark": {
-        "author": "Simbochka.",
+        "author": "Mashiro.",
         "text": "Тема закрыта на рассмотрении администрацией."
       }
     },
     {
-      "threadId": 2702593,
-      "title": "Дм",
-      "url": "https://forum.majestic-rp.ru/threads/dm.2702593/",
+      "threadId": 2703962,
+      "title": "Оск род",
+      "url": "https://forum.majestic-rp.ru/threads/osk-rod.2703962",
       "status": "in_review",
-      "complaintAuthor": "Bebross",
-      "complaintText": "Дм",
+      "complaintAuthor": "kiruha228ganja",
+      "complaintText": "Сказал что батя умер",
       "adminMark": {
         "author": "milgrif",
-        "text": "На рассмотрении"
+        "text": "На рассмотрении."
       }
     },
     {
-      "threadId": 2702557,
-      "title": "игнорирование отыгровки в do",
-      "url": "https://forum.majestic-rp.ru/threads/ignorirovaniye-otygrovki-v-do.2702557/",
-      "status": "in_review",
-      "complaintAuthor": "Gokuro_Sakugawa",
-      "complaintText": "",
-      "adminMark": {
-        "author": "milgrif",
-        "text": "На рассмотрении"
-      }
-    },
-    {
-      "threadId": 2702538,
+      "threadId": 2703886,
       "title": "Жалоба",
-      "url": "https://forum.majestic-rp.ru/threads/zhaloba.2702538/",
+      "url": "https://forum.majestic-rp.ru/threads/zhaloba.2703886",
       "status": "in_review",
-      "complaintAuthor": "Leki3452",
-      "complaintText": "тип подрезал а потом и вовсе вышел в троих",
+      "complaintAuthor": "Huko Pulse",
+      "complaintText": "Мне выдали розыск и через некоторое время меня садит другой сотрудник, спустя время мне пере выдают розыск один и тот же сотрудник что мне его у первый раз давал. С первого розыска прошло 4 часа+-. Выдали первый розыск в 19:11, посадил другой человек в 22:20, второй раз мне выдали розыск в 22:54 по одной и той же причине, один и тот же человек.",
       "adminMark": {
         "author": "milgrif",
-        "text": "На рассмотрении"
-      }
-    },
-    {
-      "threadId": 2702398,
-      "title": "дм",
-      "url": "https://forum.majestic-rp.ru/threads/dm.2702398/",
-      "status": "in_review",
-      "complaintAuthor": "Shket0",
-      "complaintText": "дм",
-      "adminMark": {
-        "author": "milgrif",
-        "text": "На рассмотрении"
-      }
-    },
-    {
-      "threadId": 2698760,
-      "title": "жалоба на 3040",
-      "url": "https://forum.majestic-rp.ru/threads/zhaloba-na-3040.2698760/",
-      "status": "request_84",
-      "complaintAuthor": "OrestSalamanca",
-      "complaintText": "Мой статик 50560 Статик нарушителя 3040 Дата 04.12.2025 Время 16.28",
-      "adminMark": {
-        "author": "tonight/",
         "text": "На рассмотрении."
       }
     }

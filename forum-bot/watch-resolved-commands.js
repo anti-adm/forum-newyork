@@ -33,7 +33,7 @@ const TOTP_SECRET = "JTL263OQAFOGMDML";
 const API_URL =
   process.env.FORUM_RESOLVED_API_URL ||
   "http://localhost:3000/api/forum/resolved";
-const BOT_TOKEN = process.env.FORUM_BOT_TOKEN || "super-secret-string";
+const BOT_TOKEN = process.env.FORUM_BOT_TOKEN || "ANTI222333111MAJESTICRP";
 
 // сколько НЕОБРАБОТАННЫХ тредов берём за один проход
 const THREAD_LIMIT = 10;

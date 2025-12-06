@@ -1,0 +1,25 @@
+{
+  "threadId": 2703930,
+  "threadTitle": "milgrif-0130",
+  "threadUrl": "https://forum.majestic-rp.ru/threads/milgrif-0130.2703930",
+  "adminForumName": "milgrif",
+  "complaint": {
+    "author": "Shket0",
+    "text": "ОСК РОДНИ"
+  },
+  "finalReply": {
+    "author": "milgrif",
+    "text": "Приветствую,\n\nИгрок #9594 получит 30 дней hardban'a за Оскорбление родных.\n\nЗакрыто."
+  },
+  "punishments": [
+    {
+      "type": "hardban",
+      "staticId": "9594",
+      "duration": 30,
+      "unit": "days",
+      "command": "/hardban 9594 30 Жалоба milgrif-0130",
+      "context": "получит 30 дней hardban'a за Оскорбление родных"
+    }
+  ],
+  "fetchedAt": "2025-12-06T22:40:58.524Z"
+}
